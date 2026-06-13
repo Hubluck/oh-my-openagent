@@ -1,0 +1,8 @@
+{
+	"nodes":[
+		{"id":"c8233484c87f3e05","x":-125,"y":-30,"width":250,"height":60,"type":"text","text":""},
+		{"id":"d980580edec4a2fc","x":-195,"y":-311,"width":250,"height":60,"type":"text","text":""},
+		{"id":"770709a080ee12a4","x":-200,"y":-200,"width":400,"height":400,"type":"file","file":"무제.md"}
+	],
+	"edges":[]
+}

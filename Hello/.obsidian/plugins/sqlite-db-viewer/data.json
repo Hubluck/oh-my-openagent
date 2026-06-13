@@ -1,0 +1,6 @@
+{
+  "defaultRowLimit": 10,
+  "renderInLivePreview": true,
+  "renderMarkdownInCells": true,
+  "tableStyle": "default"
+}
