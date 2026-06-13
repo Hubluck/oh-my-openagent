@@ -10,5 +10,7 @@
   "obsidian-style-settings",
   "auto-card-link-enhanced",
   "infinite-note-auto-append-newline",
-  "sqlite-db-viewer"
+  "sqlite-db-viewer",
+  "recent-files-obsidian",
+  "editing-toolbar"
 ]
