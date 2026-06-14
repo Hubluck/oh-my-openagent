@@ -11,10 +11,10 @@
             "id": "68553e581b5f5b0f",
             "type": "leaf",
             "state": {
-              "type": "empty",
+              "type": "graph",
               "state": {},
-              "icon": "lucide-file",
-              "title": "새 탭"
+              "icon": "lucide-git-fork",
+              "title": "그래프 뷰"
             }
           }
         ]
@@ -162,8 +162,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -176,8 +175,9 @@
       "bases:새 베이스 생성하기": false
     }
   },
-  "active": "8431fe0ae43ebc0e",
+  "active": "68553e581b5f5b0f",
   "lastOpenFiles": [
+    "무제.md",
     "AI-Sessions/wiki/concepts/claude-code-workflow-principles.md"
   ]
 }
