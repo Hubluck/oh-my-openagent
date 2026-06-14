@@ -95,7 +95,7 @@ AI-Agent-Wiki/
 
 ## Concepts
 
-아직 등록된 concept 문서가 없습니다.
+- 2026-06-14 [[AI-Sessions/wiki/concepts/claude-code-workflow-principles]] — Claude Code 워크플로우 운영 원칙 (Plan/Subagent/Verification/Elegance 등 6+6+3 원칙)
 
 ---
 
