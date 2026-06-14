@@ -25,3 +25,4 @@ YYYY-MM-DD HH:mm | command | summary | linked files
 <!-- 새 항목은 아래에 시간순으로 추가 -->
 
 2026-06-14 | init | Hello vault(개인용)에 템플릿 v1.0.0 적용 + Karpathy 원칙 + `reference` 명령 + 5필터 체크리스트 (회사용 _company wiki와 분리 운영) | CLAUDE.md, AGENTS.md, index.md, log.md
+2026-06-14 | save | Claude Code 창시자 워크플로우 운영 원칙 저장 (5필터: 3/5 통과 — 재사용성/인수인계성/공통규칙성) | wiki/concepts/claude-code-workflow-principles.md, index.md
