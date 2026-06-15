@@ -18,6 +18,7 @@ updated: 2026-06-15
 - [[llm-wiki]] — LLM이 유지하는 누적형 마크다운 지식베이스
 - [[ingest-query-lint]] — 위키 운영 3대 동작
 - [[rag]] — 검색 기반 생성 (LLM Wiki와 비교)
+- [[typed-edges]] — 모순을 보존하는 타입 있는 관계 링크
 
 ## 👤 Entities (인물·조직·도구)
 - [[andrej-karpathy]] — LLM Wiki 개념의 저자

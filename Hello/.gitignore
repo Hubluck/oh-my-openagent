@@ -11,3 +11,6 @@
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Claude Code 위키 스킬 — 이 폴더에만 로컬로 (원격/타 기기 동기화 제외)
+.claude/skills/
