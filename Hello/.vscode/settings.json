@@ -1,4 +1,0 @@
-{
-  // 통합 터미널 잔상(고스팅)/줄 겹침 방지: GPU 가속 비활성화
-  "terminal.integrated.gpuAcceleration": "off"
-}
