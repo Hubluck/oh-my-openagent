@@ -1,0 +1,12 @@
+{
+  "enhanceDefaultPaste": false,
+  "showInMenuItem": true,
+  "blankLineBeforeCard": true,
+  "thumbnailPosition": "left",
+  "downloadImages": false,
+  "imageFolder": "AutoCardLink",
+  "downloadFavicons": false,
+  "faviconFolder": "AutoCardLink/favicons",
+  "cardStyle": "classic",
+  "youtubeThumbnailQuality": "better-preview"
+}
