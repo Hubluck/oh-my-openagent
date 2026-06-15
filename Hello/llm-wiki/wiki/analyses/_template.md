@@ -1,5 +1,5 @@
 ---
-type: synthesis
+type: analysis
 created: 2026-06-15
 updated: 2026-06-15
 ---
