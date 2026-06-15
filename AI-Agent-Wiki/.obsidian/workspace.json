@@ -101,7 +101,7 @@
                 "showSearch": false,
                 "searchQuery": "",
                 "backlinkCollapsed": false,
-                "unlinkedCollapsed": true
+                "unlinkedCollapsed": false
               },
               "icon": "links-coming-in",
               "title": "무제 의 백링크"
@@ -182,7 +182,7 @@
       "bases:새 베이스 생성하기": false
     }
   },
-  "active": "68553e581b5f5b0f",
+  "active": "fbc2481ae291ca54",
   "lastOpenFiles": [
     "무제.md",
     "AI-Sessions/wiki/concepts/claude-code-workflow-principles.md"
