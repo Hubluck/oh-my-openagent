@@ -8,6 +8,8 @@ updated: 2026-06-15
 
 새 항목은 위에 추가한다. 형식: `YYYY-MM-DD — 동작 — 요약`
 
+- 2026-06-15 — dedup+ingest — 사주 중복 정리(무제 1.md→사주-원본.md 보존, 2026-05-30.md→_archive) 후 ingest → 요약 [[사주-메모]] + 개념 [[사주]]·[[오행]]·[[십성]] 생성, index 갱신
+- 2026-06-15 — ingest — raw/sources/무제 2.md(웰빙) 수집 → 요약 [[웰빙-메모]] + 개념 [[웰빙]]·[[워라밸]] 생성, index 갱신 (/wiki-ingest 첫 실전 테스트)
 - 2026-06-15 — promote — 위키를 볼트 루트로 승격(llm-wiki/ 제거). 루트 흩어진 파일 정리: 내용 노트 8개→raw/sources, 이미지·드로잉·스크린샷→raw/assets, 빈 스크래치 21개→_archive, 빈 폴더 제거. AGENTS·스킬 경로 갱신
 - 2026-06-15 — asset — raw/assets/wiki-structure-mockup.png 추가, [[AGENTS]] 구조 섹션에 임베드
 - 2026-06-15 — restructure — Karpathy 레이아웃으로 재배치: CLAUDE.md→[[AGENTS]], raw/(sources·assets)와 wiki/sources 분리, syntheses→analyses, index·log·[[inbox]] 최상단, 스킬 경로 갱신

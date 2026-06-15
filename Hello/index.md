@@ -13,12 +13,19 @@ updated: 2026-06-15
 
 ## 🗂 Sources (원본 요약)
 - [[karpathy-llm-wiki]] — Karpathy, "LLM Wiki: A Personal Knowledge System"
+- [[웰빙-메모]] — 웰빙(Well-being)에 대한 개인 메모
+- [[사주-메모]] — 사주(명리학)에 대한 개인 메모
 
 ## 💡 Concepts (개념)
 - [[llm-wiki]] — LLM이 유지하는 누적형 마크다운 지식베이스
 - [[ingest-query-lint]] — 위키 운영 3대 동작
 - [[rag]] — 검색 기반 생성 (LLM Wiki와 비교)
 - [[typed-edges]] — 모순을 보존하는 타입 있는 관계 링크
+- [[웰빙]] — 몸·마음이 건강하고 균형 잡힌 상태 (4대 요소)
+- [[워라밸]] — 일과 삶의 균형 (웰빙의 실천)
+- [[사주]] — 명리학 기반 운세 해석 체계 (연·월·일·시 → 팔자)
+- [[오행]] — 목화토금수 다섯 기운 (사주의 균형 분석)
+- [[십성]] — 돈·명예·사업·인맥 역할 해석 (사주)
 
 ## 👤 Entities (인물·조직·도구)
 - [[andrej-karpathy]] — LLM Wiki 개념의 저자
