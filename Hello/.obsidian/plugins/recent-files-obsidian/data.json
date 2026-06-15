@@ -1,8 +1,68 @@
 {
   "recentFiles": [
     {
+      "basename": "무제 6",
+      "path": "raw/sources/무제 6.md"
+    },
+    {
+      "basename": "무제 2",
+      "path": "raw/sources/무제 2.canvas"
+    },
+    {
       "basename": "20260527_023535_1",
       "path": "raw/assets/무제3-screenshots/20260527_023535_1.png"
+    },
+    {
+      "basename": "웰빙-메모",
+      "path": "wiki/sources/웰빙-메모.md"
+    },
+    {
+      "basename": "사주-메모",
+      "path": "wiki/sources/사주-메모.md"
+    },
+    {
+      "basename": "andrej-karpathy",
+      "path": "wiki/entities/andrej-karpathy.md"
+    },
+    {
+      "basename": "_template",
+      "path": "wiki/entities/_template.md"
+    },
+    {
+      "basename": "웰빙",
+      "path": "wiki/concepts/웰빙.md"
+    },
+    {
+      "basename": "워라밸",
+      "path": "wiki/concepts/워라밸.md"
+    },
+    {
+      "basename": "오행",
+      "path": "wiki/concepts/오행.md"
+    },
+    {
+      "basename": "사주",
+      "path": "wiki/concepts/사주.md"
+    },
+    {
+      "basename": "_template",
+      "path": "wiki/concepts/_template.md"
+    },
+    {
+      "basename": "llm-wiki-vs-rag",
+      "path": "wiki/analyses/llm-wiki-vs-rag.md"
+    },
+    {
+      "basename": "_template",
+      "path": "wiki/analyses/_template.md"
+    },
+    {
+      "basename": "20260527_023535_4",
+      "path": "raw/assets/무제3-screenshots/20260527_023535_4.png"
+    },
+    {
+      "basename": "20260527_023535_2",
+      "path": "raw/assets/무제3-screenshots/20260527_023535_2.png"
     }
   ],
   "omittedPaths": [],
