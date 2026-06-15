@@ -23,6 +23,9 @@ llm-wiki/
 
 핵심 구분: **`raw/` = 원본(불변)**, **`wiki/` = LLM이 만든 지식**. 특히 `raw/sources/`(원본)와 `wiki/sources/`(그 요약)를 혼동하지 말 것.
 
+목표 레이아웃 참고 이미지:
+![[wiki-structure-mockup.png]]
+
 ## 3가지 핵심 동작 → 스킬로 위임
 절차 상세는 각 스킬에 있다 (이 파일은 공통 규칙만 보유).
 - **Ingest** (자료 수집) → `/wiki-ingest`
