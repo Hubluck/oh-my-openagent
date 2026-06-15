@@ -136,7 +136,7 @@
   "noticeTimeout": 5,
   "openChangelogOnUpdate": true,
   "pinNewInstance": true,
-  "preferredRenderer": "webgl",
+  "preferredRenderer": "canvas",
   "profiles": {
     "darwinExternalDefault": {
       "args": [
