@@ -5,20 +5,23 @@
 
 ## 구조
 
+이 볼트 **루트 자체가 위키**다 (2026-06-15 승격).
+
 ```
-llm-wiki/
+<vault root>/
 ├── AGENTS.md        ← (이 파일) 운영 규칙 / 스키마
 ├── index.md         ← 전체 목차 / 진입점
 ├── log.md           ← 시간순 작업 로그
 ├── inbox.md         ← 미처리 캡처(아직 ingest 안 된 메모·링크)
 ├── raw/             ← 원본(불변, 사람이 추가). LLM은 읽기만.
 │   ├── sources/     ← 원본 문서(아티클·논문·메모)
-│   └── assets/      ← 이미지 등 첨부 (예: 자동차판매량.jpeg)
-└── wiki/            ← LLM 생성물
-    ├── sources/     ← 원본의 요약 페이지 (raw/sources 한 건당 하나)
-    ├── concepts/    ← 개념 페이지
-    ├── entities/    ← 인물·조직·도구 등 엔티티 페이지
-    └── analyses/    ← 여러 자료를 종합·분석한 페이지
+│   └── assets/      ← 이미지·드로잉 등 첨부
+├── wiki/            ← LLM 생성물
+│   ├── sources/     ← 원본의 요약 페이지 (raw/sources 한 건당 하나)
+│   ├── concepts/    ← 개념 페이지
+│   ├── entities/    ← 인물·조직·도구 등 엔티티 페이지
+│   └── analyses/    ← 여러 자료를 종합·분석한 페이지
+└── _archive/        ← 빈/폐기 스크래치 보관 (위키 대상 아님)
 ```
 
 핵심 구분: **`raw/` = 원본(불변)**, **`wiki/` = LLM이 만든 지식**. 특히 `raw/sources/`(원본)와 `wiki/sources/`(그 요약)를 혼동하지 말 것.
