@@ -267,9 +267,11 @@
       "type": "external"
     },
     "win32IntegratedDefault": {
-      "args": [],
+      "args": [
+        "-NoLogo"
+      ],
       "environment": [],
-      "executable": "C:\\Windows\\System32\\cmd.exe",
+      "executable": "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.6.2.0_x64__8wekyb3d8bbwe\\pwsh.exe",
       "followTheme": true,
       "name": "",
       "platforms": {
@@ -284,22 +286,22 @@
         "SIGTERM"
       ],
       "terminalOptions": {
-        "documentOverride": null,
         "fontFamily": "Consolas, 'Cascadia Mono', monospace",
         "fontSize": 12,
-        "lineHeight": 1,
-        "letterSpacing": 0
+        "letterSpacing": 0,
+        "lineHeight": 1.2,
+        "documentOverride": null
       },
       "type": "integrated",
       "useWin32Conhost": true
     }
   },
-  "defaultProfile": null,
+  "defaultProfile": "win32IntegratedDefault",
   "terminalOptions": {
-    "documentOverride": null,
     "fontFamily": "Consolas, 'Cascadia Mono', monospace",
     "fontSize": 12,
-    "lineHeight": 1,
-    "letterSpacing": 0
+    "letterSpacing": 0,
+    "lineHeight": 1.2,
+    "documentOverride": null
   }
 }
