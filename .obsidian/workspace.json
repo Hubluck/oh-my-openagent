@@ -182,8 +182,13 @@
       "bases:새 베이스 생성하기": false
     }
   },
-  "active": "07bfe98f6c534695",
+  "active": "efbe723877aed8d2",
   "lastOpenFiles": [
-    "무제.md"
+    "무제.base",
+    "무제.md",
+    "knowledge/index.md",
+    "knowledge/notes",
+    "knowledge/raw",
+    "knowledge"
   ]
 }
