@@ -296,6 +296,10 @@
   },
   "defaultProfile": null,
   "terminalOptions": {
-    "documentOverride": null
+    "documentOverride": null,
+    "fontFamily": "Consolas, 'Cascadia Mono', monospace",
+    "fontSize": 12,
+    "lineHeight": 1,
+    "letterSpacing": 0
   }
 }
