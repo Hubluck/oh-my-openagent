@@ -284,7 +284,11 @@
         "SIGTERM"
       ],
       "terminalOptions": {
-        "documentOverride": null
+        "documentOverride": null,
+        "fontFamily": "Consolas, 'Cascadia Mono', monospace",
+        "fontSize": 12,
+        "lineHeight": 1,
+        "letterSpacing": 0
       },
       "type": "integrated",
       "useWin32Conhost": true
