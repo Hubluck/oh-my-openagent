@@ -1,14 +1,6 @@
 {
   "recentFiles": [
     {
-      "basename": "무제 6",
-      "path": "raw/sources/무제 6.md"
-    },
-    {
-      "basename": "무제 2",
-      "path": "raw/sources/무제 2.canvas"
-    },
-    {
       "basename": "사주-원본",
       "path": "raw/sources/사주-원본.md"
     },
@@ -19,10 +11,6 @@
     {
       "basename": "무제 1",
       "path": "_archive/무제 1.canvas"
-    },
-    {
-      "basename": "20260527_023535_1",
-      "path": "raw/assets/무제3-screenshots/20260527_023535_1.png"
     },
     {
       "basename": "웰빙-메모",
@@ -67,14 +55,6 @@
     {
       "basename": "_template",
       "path": "wiki/analyses/_template.md"
-    },
-    {
-      "basename": "20260527_023535_4",
-      "path": "raw/assets/무제3-screenshots/20260527_023535_4.png"
-    },
-    {
-      "basename": "20260527_023535_2",
-      "path": "raw/assets/무제3-screenshots/20260527_023535_2.png"
     }
   ],
   "omittedPaths": [],
