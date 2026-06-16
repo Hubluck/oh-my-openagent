@@ -24,7 +24,7 @@ author: Andrej Karpathy
 
 ## 추가 디테일 (2026-06-15 재독으로 보강)
 - **디렉터리 관례**: 원본은 `raw/`(이미지는 `raw/assets/`), 위키는 `wiki/`. 스키마는 `CLAUDE.md`/`AGENTS.md`.
-  - 본 볼트도 이 관례를 따른다: `raw/sources/`+`raw/assets/`, 스키마 `AGENTS.md`, 원본 요약은 `wiki/sources/`.
+  - 본 볼트도 이 관례를 따른다: `raw/sources/`+`raw/assets/`, 스키마 `AGENTS.md`, 원본 요약은 `docs/sources/`(이 볼트는 `wiki/` 대신 `docs/` 사용).
 - **페이지 종류**: source 요약 / 엔티티 / 개념 / 도메인 전체 overview / index / log.
 - **log 형식**: append-only, 파싱 가능한 헤더 `## [YYYY-MM-DD] operation | Title`.
 - **Ingest 규모감**: 자료 하나가 기존 **10~15개 페이지**를 건드릴 수 있다.

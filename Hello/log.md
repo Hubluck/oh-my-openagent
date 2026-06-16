@@ -8,6 +8,11 @@ updated: 2026-06-15
 
 새 항목은 위에 추가한다. 형식: `YYYY-MM-DD — 동작 — 요약`
 
+- 2026-06-16 — lint-fix — [[주식매매-메모]] frontmatter `updated` 2026-06-15→2026-06-16 보정(어제 스크린샷 폴더 경로 수정 반영). 전체 lint 결과 고아·깨진 링크·index 누락 없음(클린)
+
+- 2026-06-16 — cleanup — raw/sources의 무제 잔재 정리: `무제 2.canvas`(빈 캔버스)·`무제 6.md`(Evernote 링크 stub)→_archive, `assets/무제3-screenshots`→`주식매매-screenshots` 개명, [[inbox]]·[[주식매매-메모]] 참조 갱신
+- 2026-06-16 — rename — 위키 문서 저장소 `wiki/` → `docs/` 개명(역할 동일, sources·concepts·entities·analyses 유지). AGENTS·스킬(wiki-ingest·wiki-query)·raw/sources README·inbox·_archive README·루트 CLAUDE.md 경로 갱신. 스킬명(/wiki-*)·개념어 "위키"는 유지
+
 - 2026-06-15 — ingest — 무제 3.md(주식 스크린샷 34장) 처리 → 무제 3.md→주식매매-원본.md, 요약 [[주식매매-메모]] + 개념 [[주도주]]·[[테마주]]·[[조건검색]] 생성, inbox 완료 처리
 - 2026-06-15 — lint-fix — 웰빙 원본 이름 통일(무제 2.md→웰빙-원본.md, [[웰빙-메모]] 경로 갱신); 미처리 원본 분류: junk 2개(202605301844·나의 맥락)→_archive, 무제 3·6은 [[inbox]] 등재
 - 2026-06-15 — dedup+ingest — 사주 중복 정리(무제 1.md→사주-원본.md 보존, 2026-05-30.md→_archive) 후 ingest → 요약 [[사주-메모]] + 개념 [[사주]]·[[오행]]·[[십성]] 생성, index 갱신

@@ -21,7 +21,7 @@
 | 폴더 | 무엇인가 | 규칙 파일 (먼저 읽기) | 새 작업물 위치 / 주의 |
 |---|---|---|---|
 | `_company/` | 1인 기업 OS. AI 에이전트(ceo·developer·designer·writer 등)의 공유 메모리·세션·승인 워크플로 | `_company/_shared/_system.md` | 산출물은 `sessions/<ts>/`. 공유 기억은 `_shared/`. `00_Raw/`는 읽기 전용. `_agents/*/config.md`는 시크릿(절대 커밋/노출 금지) |
-| `Hello/` | Karpathy 패턴 LLM 위키 (이 폴더 자체가 위키 루트) | `Hello/AGENTS.md` | 원본은 `Hello/raw/`(불변), 가공 지식은 `Hello/wiki/`. 운영은 `/wiki-ingest`·`/wiki-query`·`/wiki-lint` 스킬 |
+| `Hello/` | Karpathy 패턴 LLM 위키 (이 폴더 자체가 위키 루트) | `Hello/AGENTS.md` | 원본은 `Hello/raw/`(불변), 가공된 위키 문서는 `Hello/docs/`(sources·concepts·entities·analyses). 운영은 `/wiki-ingest`·`/wiki-query`·`/wiki-lint` 스킬 |
 | `AI-Agent-Wiki/` | 또 다른 LLM 위키 (자체 CLAUDE.md 보유, AI 에이전트 주제) | `AI-Agent-Wiki/CLAUDE.md` | 원본 `AI-Sessions/raw/`(불변), 가공 `AI-Sessions/wiki/`. `save`/`reference`/`ingest`/`query`/`lint` 명령 규약 |
 | `knowledge/` | 범용 지식 베이스 (raw → notes 2계층) | `knowledge/index.md` | 원본 `knowledge/raw/`(불변), 가공 노트 `knowledge/notes/`. 노트 상단에 `source:` 출처 명시 |
 | `video/` | Remotion(React) 영상 프로젝트. **코드 프로젝트** — 위키 아님 | `video/README.md`, `video/package.json` | `node_modules`는 `.gitignore`. 코드 작업은 `video/src/`. 여기서는 위키 규칙 적용 안 함 |
