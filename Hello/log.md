@@ -8,6 +8,8 @@ updated: 2026-06-15
 
 새 항목은 위에 추가한다. 형식: `YYYY-MM-DD — 동작 — 요약`
 
+- 2026-06-16 — convention — 폴더별 규칙 파일 추가: `raw/CLAUDE.md`(불변·읽기전용·상태는 inbox/log로 추적)·`docs/CLAUDE.md`(재구성·연결 필수·출처는 source는 frontmatter경로/concept는 본문링크). 둘 다 단일기준은 [[AGENTS]], 충돌 시 AGENTS 우선임을 명시. AGENTS에 안내 한 줄 추가
+
 - 2026-06-16 — lint-fix — [[주식매매-메모]] frontmatter `updated` 2026-06-15→2026-06-16 보정(어제 스크린샷 폴더 경로 수정 반영). 전체 lint 결과 고아·깨진 링크·index 누락 없음(클린)
 
 - 2026-06-16 — cleanup — raw/sources의 무제 잔재 정리: `무제 2.canvas`(빈 캔버스)·`무제 6.md`(Evernote 링크 stub)→_archive, `assets/무제3-screenshots`→`주식매매-screenshots` 개명, [[inbox]]·[[주식매매-메모]] 참조 갱신

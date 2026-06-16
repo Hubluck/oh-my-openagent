@@ -26,6 +26,8 @@
 
 핵심 구분: **`raw/` = 원본(불변)**, **`docs/` = LLM이 만든 지식(위키 문서)**. 특히 `raw/sources/`(원본)와 `docs/sources/`(그 요약)를 혼동하지 말 것.
 
+> `raw/`와 `docs/`에는 각 폴더 특화 규칙 요약본 `CLAUDE.md`가 있다(Claude Code가 그 폴더 작업 시 자동으로 읽음). **공통 스키마의 단일 기준은 이 `AGENTS.md`** 이며, 폴더 CLAUDE.md와 충돌하면 이 파일이 우선한다.
+
 목표 레이아웃 참고 이미지:
 ![[wiki-structure-mockup.png]]
 
