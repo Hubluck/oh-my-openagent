@@ -226,6 +226,54 @@
   .foot{margin-top:26px; font-size:11px; color:var(--muted); text-align:center; line-height:1.6}
   :focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:8px}
   @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+  /* 탭 (기회 / 재고) */
+  .tabs{display:flex; gap:6px; background:var(--surface-2); border:1px solid var(--hair); border-radius:13px; padding:4px; margin-bottom:16px}
+  .tab{flex:1; border:0; background:none; color:var(--ink-2); font-family:inherit; font-size:13.5px; font-weight:800;
+    padding:9px 8px; border-radius:10px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px}
+  .tab.on{background:var(--surface); color:var(--ink); box-shadow:var(--shadow)}
+  .tabbadge{font-size:11px; font-weight:800; padding:1px 7px; border-radius:999px; background:var(--accent); color:#fff}
+  .tabbadge.zero{display:none}
+  body[data-view="inv"] .opps-only{display:none}
+  body[data-view="opps"] .inv-only{display:none}
+
+  /* 재고 */
+  .invhead{display:flex; align-items:baseline; justify-content:space-between; margin:2px 2px 12px}
+  .invhead h2{font-size:16px; font-weight:800; margin:0}
+  .invhead .sub2{font-size:11.5px; color:var(--muted)}
+  .invsum{display:grid; grid-template-columns:repeat(2,1fr); gap:9px; margin-bottom:14px}
+  @media(min-width:560px){.invsum{grid-template-columns:repeat(4,1fr)}}
+  .invtile{background:var(--surface); border:1px solid var(--hair); border-radius:14px; padding:11px 13px; box-shadow:var(--shadow)}
+  .invtile .l{font-size:11px; color:var(--muted); font-weight:600}
+  .invtile .v{font-size:18px; font-weight:800; margin-top:3px}
+  .invtile .v.pos{color:var(--profit)} .invtile .v.neg{color:var(--loss)}
+  .invactions{display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap}
+  .invempty{text-align:center; color:var(--muted); padding:46px 16px; font-size:13px; line-height:1.7;
+    border:1px dashed var(--hair); border-radius:14px}
+  .invlist{display:flex; flex-direction:column; gap:10px}
+  .invrow{background:var(--surface); border:1px solid var(--hair); border-radius:14px; padding:12px 13px; box-shadow:var(--shadow);
+    position:relative; overflow:hidden}
+  .invrow::before{content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--accent)}
+  .invrow.sold::before{background:var(--profit)}
+  .invrow-top{display:flex; align-items:center; gap:7px; margin-bottom:9px}
+  .invrow .code{font-size:12px; font-weight:800; color:var(--accent)}
+  .invrow .nm{font-size:12px; color:var(--ink-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1}
+  .invrow-x{border:0; background:none; color:var(--muted); font-size:16px; cursor:pointer; flex:none; padding:0 2px}
+  .statuspill{font-size:10.5px; font-weight:800; padding:3px 9px; border-radius:999px; cursor:pointer; border:1px solid var(--hair); background:var(--surface-2); color:var(--ink-2)}
+  .statuspill.sold{background:var(--profit); color:#fff; border-color:var(--profit)}
+  .invfields{display:grid; grid-template-columns:repeat(2,1fr); gap:8px}
+  .invf{display:flex; flex-direction:column; gap:3px}
+  .invf label{font-size:10px; font-weight:700; color:var(--muted); letter-spacing:.02em}
+  .invf input{border:1px solid var(--hair); background:var(--surface-2); color:var(--ink); border-radius:8px;
+    padding:7px 9px; font-size:13px; font-family:inherit; font-variant-numeric:tabular-nums; width:100%}
+  .invf input:focus{outline:2px solid var(--accent); outline-offset:1px}
+  .invf.sellonly[hidden]{display:none}
+  .invpl{display:flex; align-items:center; justify-content:space-between; margin-top:10px; padding-top:9px; border-top:1px solid var(--hair)}
+  .invpl .pll{font-size:11px; font-weight:700; color:var(--muted)}
+  .invpl .plv{font-size:15px; font-weight:800; color:var(--profit)} .invpl .plv.neg{color:var(--loss)}
+  .cart{flex:none; border:1px solid var(--hair); background:var(--surface-2); color:var(--ink-2); border-radius:8px;
+    padding:4px 10px; font-size:11.5px; font-weight:700; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; gap:4px}
+  .cart:active{transform:scale(.95)} .cart.done{background:var(--profit); color:#fff; border-color:var(--profit)}
 </style>
 
 <div class="wrap">
@@ -241,6 +289,12 @@
     </div>
   </header>
 
+  <div class="tabs">
+    <button class="tab on" data-view="opps" type="button">🔎 기회 찾기</button>
+    <button class="tab" data-view="inv" type="button">📦 내 재고 <span class="tabbadge zero" id="invtabcount">0</span></button>
+  </div>
+
+  <div class="opps-only">
   <div class="datatools">
     <button class="dbtn primary" id="addbtn">＋ 조사일 추가</button>
     <button class="dbtn" id="exportbtn" title="현재 조사일을 JSON으로 내려받아 볼트 data/ 에 커밋">⬇ JSON 내보내기</button>
@@ -312,6 +366,21 @@
   <div class="countline"><span id="count"></span><span id="showing"></span></div>
   <div class="list" id="list"></div>
   <button class="more" id="more" hidden>더 보기</button>
+  </div><!-- /opps-only -->
+
+  <section class="inv-only" id="invview">
+    <div class="invhead">
+      <div><h2>📦 내 재고</h2><div class="sub2">구매하면 담고, 팔면 판매완료로 · 수수료·택배비 반영 손익</div></div>
+    </div>
+    <div class="invsum" id="invsum"></div>
+    <div class="invactions">
+      <button class="dbtn" id="invExportCsv">⬇ CSV(엑셀)</button>
+      <button class="dbtn" id="invExportJson">⬇ JSON</button>
+      <button class="dbtn" id="invClearSold">판매완료 정리</button>
+    </div>
+    <div class="invlist" id="invlist"></div>
+  </section>
+
   <div class="foot" id="foot"></div>
 </div>
 
@@ -588,6 +657,7 @@ window.ShoeXlsx = (function(){
     return `<div class="row ${neg?'neg':''}" data-key="${escapeHtml(key)}">
       <div class="row-code">
         <span class="codeval ${code?'':'none'} num">${code?escapeHtml(code):'품번 없음'}</span>
+        <button class="cart" data-act="cart" type="button">🛒 구매</button>
         ${code?`<button class="copybtn" data-act="copy" data-code="${escapeHtml(code)}" type="button">⧉ 복사</button>`:''}
       </div>
       <div class="row-top">
@@ -804,6 +874,10 @@ window.ShoeXlsx = (function(){
     const cp=e.target.closest('[data-act="copy"]');
     if(cp){ copyText(cp.dataset.code); const orig=cp.textContent; cp.classList.add('done'); cp.textContent='✓ 복사됨';
       setTimeout(()=>{cp.classList.remove('done'); cp.textContent=orig;},1200); return; }
+    const ct=e.target.closest('[data-act="cart"]');
+    if(ct){ const x=findRec(ct.closest('.row').getAttribute('data-key')); if(x) addToInv(x);
+      const orig=ct.textContent; ct.classList.add('done'); ct.textContent='✓ 담김';
+      setTimeout(()=>{ct.classList.remove('done'); ct.textContent=orig;},1200); return; }
     const pin=e.target.closest('[data-act="pin"]'); if(!pin) return;
     const key=pin.closest('.row').getAttribute('data-key'); const x=findRec(key); if(x) togglePin(x);
   });
@@ -843,7 +917,129 @@ window.ShoeXlsx = (function(){
     reqItems={}; reqGeneral=''; genEl.value=''; persistReq(); paint(); renderReq();
   });
 
+  // ---------- 재고 (구매 → 판매, 손익) ----------
+  const INV_KEY='shoeArb.inventory.v1';
+  let inv=[];
+  (function(){ try{ inv=JSON.parse(localStorage.getItem(INV_KEY))||[]; }catch(e){ inv=[]; } })();
+  const today=()=>new Date().toISOString().slice(0,10);
+  function persistInv(){ try{ localStorage.setItem(INV_KEY, JSON.stringify(inv)); }catch(e){ toast('저장공간 부족'); } }
+  let ipt; function persistInvSoon(){ clearTimeout(ipt); ipt=setTimeout(persistInv,300); }
+  const invUnitNet=(it,price)=>Math.round((+price||0) - poizonFee(+price||0) - (+it.buyPrice||0) - (+it.ship||0));
+  const invPL=it=> it.status==='sold' ? invUnitNet(it,it.sellPrice)*(+it.qty||1) : invUnitNet(it,it.marketPrice)*(+it.qty||1);
+
+  function addToInv(x){
+    inv.push({id:Date.now()+'-'+Math.random().toString(36).slice(2,6), code:x[9]||'', name:x[0], brand:B[x[1]], site:S[x[2]],
+      buyPrice:x[3], qty:1, ship:3000, buyDate:today(), marketPrice:x[5], status:'holding', sellPrice:'', sellDate:''});
+    persistInv(); updateInvBadge(); toast('재고에 담김 · 📦 내 재고 탭에서 확인');
+  }
+  function updateInvBadge(){ const el=$('invtabcount'); el.textContent=inv.length; el.classList.toggle('zero',inv.length===0); }
+
+  function renderInvSummary(){
+    const hold=inv.filter(i=>i.status!=='sold'), sold=inv.filter(i=>i.status==='sold');
+    const qtyHold=hold.reduce((a,i)=>a+(+i.qty||1),0);
+    const invested=hold.reduce((a,i)=>a+((+i.buyPrice||0)+(+i.ship||0))*(+i.qty||1),0);
+    const expected=hold.reduce((a,i)=>a+invPL(i),0);
+    const realized=sold.reduce((a,i)=>a+invPL(i),0);
+    const tiles=[
+      {l:'보유 수량', v:qtyHold.toLocaleString()+'개', c:''},
+      {l:'투자금', v:won(invested), c:''},
+      {l:'예상 실현이익', v:signed(expected), c:expected<0?'neg':'pos'},
+      {l:'확정 손익', v:signed(realized), c:realized<0?'neg':'pos'},
+    ];
+    $('invsum').innerHTML=tiles.map(t=>`<div class="invtile"><div class="l">${t.l}</div><div class="v ${t.c}">${t.v}</div></div>`).join('');
+  }
+  function invRowHTML(it){
+    const sold=it.status==='sold', pl=invPL(it);
+    return `<div class="invrow ${sold?'sold':''}" data-id="${it.id}">
+      <div class="invrow-top">
+        <span class="code num">${escapeHtml(it.code||'—')}</span>
+        <span class="nm">${escapeHtml(it.brand||'')} · ${escapeHtml(it.name||'')}</span>
+        <button class="statuspill ${sold?'sold':''}" data-act="status" type="button">${sold?'판매완료':'보유중'}</button>
+        <button class="invrow-x" data-act="invdel" type="button" aria-label="삭제">×</button>
+      </div>
+      <div class="invfields">
+        <div class="invf"><label>구매가</label><input data-f="buyPrice" type="number" inputmode="numeric" value="${it.buyPrice||0}"></div>
+        <div class="invf"><label>수량</label><input data-f="qty" type="number" min="1" inputmode="numeric" value="${it.qty||1}"></div>
+        <div class="invf"><label>택배비</label><input data-f="ship" type="number" inputmode="numeric" value="${it.ship||0}"></div>
+        <div class="invf"><label>구매일</label><input data-f="buyDate" type="date" value="${it.buyDate||''}"></div>
+        <div class="invf sellonly" ${sold?'':'hidden'}><label>판매가</label><input data-f="sellPrice" type="number" inputmode="numeric" value="${it.sellPrice||''}"></div>
+        <div class="invf sellonly" ${sold?'':'hidden'}><label>판매일</label><input data-f="sellDate" type="date" value="${it.sellDate||''}"></div>
+      </div>
+      <div class="invpl">
+        <span class="pll">${sold?'확정 손익':'예상 실현이익 · 시장가 '+won(it.marketPrice||0)}</span>
+        <span class="plv ${pl<0?'neg':''}">${signed(pl)}</span>
+      </div>
+    </div>`;
+  }
+  function renderInvList(){
+    const box=$('invlist');
+    if(!inv.length){ box.innerHTML='<div class="invempty">아직 재고가 없어요.<br>「🔎 기회 찾기」에서 상품 카드의 <b>🛒 구매</b>를 누르면 여기에 담깁니다.</div>'; return; }
+    const order=inv.slice().sort((a,b)=>(a.status==='sold')-(b.status==='sold'));
+    box.innerHTML=order.map(invRowHTML).join('');
+  }
+  function renderInv(){ renderInvSummary(); renderInvList(); updateInvBadge(); }
+  function findInv(id){ return inv.find(i=>i.id===id); }
+
+  $('invlist').addEventListener('input',e=>{
+    const inp=e.target.closest('[data-f]'); if(!inp) return;
+    const it=findInv(inp.closest('.invrow').getAttribute('data-id')); if(!it) return;
+    const f=inp.dataset.f;
+    it[f] = (f==='buyDate'||f==='sellDate') ? inp.value : (+inp.value||0);
+    persistInvSoon();
+    const row=inp.closest('.invrow'); const pl=invPL(it);
+    const plv=row.querySelector('.plv'); plv.textContent=signed(pl); plv.classList.toggle('neg',pl<0);
+    renderInvSummary();
+  });
+  $('invlist').addEventListener('click',e=>{
+    const st=e.target.closest('[data-act="status"]');
+    if(st){ const it=findInv(st.closest('.invrow').getAttribute('data-id')); if(!it) return;
+      if(it.status==='sold'){ it.status='holding'; }
+      else { it.status='sold'; if(!it.sellPrice) it.sellPrice=it.marketPrice||0; if(!it.sellDate) it.sellDate=today(); }
+      persistInv(); renderInv(); return; }
+    const del=e.target.closest('[data-act="invdel"]');
+    if(del){ const id=del.closest('.invrow').getAttribute('data-id');
+      if(!confirm('이 재고 항목을 삭제할까요?')) return;
+      inv=inv.filter(i=>i.id!==id); persistInv(); renderInv(); }
+  });
+
+  function downloadFile(text, name, mime){
+    const blob=new Blob([text],{type:mime}); const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob); a.download=name; a.click(); URL.revokeObjectURL(a.href);
+  }
+  function csvCell(v){ v=(v==null?'':''+v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+  $('invExportCsv').addEventListener('click',()=>{
+    if(!inv.length){ toast('재고가 비어 있어요'); return; }
+    const head=['품번','상품명','브랜드','매장','구매가','수량','택배비','구매일','상태','판매가','판매일','기준시장가','단위손익','총손익'];
+    const rows=inv.map(it=>{ const sold=it.status==='sold'; const unit=invUnitNet(it, sold?it.sellPrice:it.marketPrice);
+      return [it.code,it.name,it.brand,it.site,it.buyPrice,it.qty,it.ship,it.buyDate, sold?'판매완료':'보유중',
+        sold?it.sellPrice:'', it.sellDate||'', it.marketPrice, unit, unit*(+it.qty||1)]; });
+    const csv=[head,...rows].map(r=>r.map(csvCell).join(',')).join('\r\n');
+    downloadFile('﻿'+csv, `inventory-${today()}.csv`, 'text/csv;charset=utf-8');
+    toast('CSV 내려받음 · 엑셀에서 열림');
+  });
+  $('invExportJson').addEventListener('click',()=>{
+    if(!inv.length){ toast('재고가 비어 있어요'); return; }
+    downloadFile(JSON.stringify({tool:'shoe-arbitrage',kind:'inventory',exportedAt:new Date().toISOString(),items:inv},null,2),
+      `inventory-${today()}.json`,'application/json');
+    toast('JSON 내려받음');
+  });
+  $('invClearSold').addEventListener('click',()=>{
+    const soldN=inv.filter(i=>i.status==='sold').length;
+    if(!soldN){ toast('판매완료 항목이 없어요'); return; }
+    if(!confirm(`판매완료 ${soldN}건을 목록에서 지울까요? (CSV로 먼저 백업 권장)`)) return;
+    inv=inv.filter(i=>i.status!=='sold'); persistInv(); renderInv();
+  });
+
+  // 탭 전환
+  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+    t.classList.add('on'); document.body.dataset.view=t.dataset.view;
+    if(t.dataset.view==='inv') renderInv();
+  }));
+
   // init
+  document.body.dataset.view='opps';
+  updateInvBadge();
   refreshSnapSelect();
   renderReq();
   loadSnapshot(curDate);
