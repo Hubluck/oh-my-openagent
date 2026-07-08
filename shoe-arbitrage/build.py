@@ -14,6 +14,7 @@
 의존성:  pip install openpyxl
 """
 import sys, os, json, re, glob, argparse, shutil
+from datetime import datetime
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(HERE, "data")
@@ -158,7 +159,8 @@ def build():
         with open(fp, encoding="utf-8") as f:
             snaps[date] = json.load(f)
     dates = sorted(snaps.keys())
-    payload = {"dates": dates, "latest": dates[-1], "snaps": snaps}
+    payload = {"dates": dates, "latest": dates[-1], "snaps": snaps,
+               "buildAt": datetime.now().strftime("%Y-%m-%d %H:%M")}
     with open(TEMPLATE, encoding="utf-8") as f:
         html = f.read()
     blob = "<script>window.DATA=" + json.dumps(payload, ensure_ascii=False, separators=(",", ":")) + ";</script>"

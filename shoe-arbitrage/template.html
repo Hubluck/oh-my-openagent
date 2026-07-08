@@ -893,7 +893,9 @@ window.ShoeXlsx = (function(){
   });
   matchMedia('(prefers-color-scheme:dark)').addEventListener('change',drawMap);
 
-  $('foot').innerHTML='소싱가=국내 리테일 최저가 · 시장가=포이즌 거래 기준가 · 수요=포이즌 누적 거래량<br>실수령=시장가−포이즌수수료−소싱가 (수수료 반영 ON 기준, 토글로 총마진 전환 가능)';
+  $('foot').innerHTML='소싱가=국내 리테일 최저가 · 시장가=포이즌 거래 기준가 · 수요=포이즌 누적 거래량<br>'
+    +'실수령=시장가−포이즌수수료−소싱가 (수수료 반영 ON 기준, 토글로 총마진 전환 가능)<br>'
+    +'<b style="color:var(--accent)">빌드 '+(BUILTIN.buildAt||'-')+'</b> · 이 값이 최신이 아니면 새로 받은 파일로 여세요';
 
   // ---------- 요청함 (상품별 📌 + 자유 메모) ----------
   const REQ_KEY='shoeArb.requests.v1';
