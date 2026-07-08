@@ -84,6 +84,44 @@
   .dropveil .big{font-size:34px; margin-bottom:10px}
   .dropveil .t{font-size:16px; font-weight:800} .dropveil .s{font-size:12.5px; opacity:.8; margin-top:5px}
 
+  /* 요청함 */
+  .reqbox{margin-bottom:16px; overflow:hidden}
+  .reqhead{width:100%; border:0; background:none; color:var(--ink); font-family:inherit; cursor:pointer;
+    display:flex; align-items:center; gap:8px; padding:13px 14px; font-size:14px; font-weight:800}
+  .reqcount{font-size:12px; font-weight:800; min-width:22px; text-align:center; padding:2px 8px; border-radius:999px;
+    background:var(--accent); color:#fff}
+  .reqcount.zero{background:var(--hair); color:var(--muted)}
+  .reqhead .chev{margin-left:auto; color:var(--muted); transition:transform .15s}
+  .reqbox.open .reqhead .chev{transform:rotate(180deg)}
+  .reqbody{padding:0 14px 14px; display:flex; flex-direction:column; gap:11px; border-top:1px solid var(--hair)}
+  .reqbody[hidden]{display:none}
+  .reqlabel{font-size:11px; font-weight:700; color:var(--muted); letter-spacing:.02em; margin-top:11px}
+  #genreq{width:100%; border:1px solid var(--hair); background:var(--surface-2); color:var(--ink); border-radius:10px;
+    padding:10px 12px; font-size:13px; font-family:inherit; resize:vertical; min-height:58px; line-height:1.5}
+  #genreq:focus{outline:2px solid var(--accent); outline-offset:1px}
+  .reqitems{display:flex; flex-direction:column; gap:8px}
+  .reqempty{font-size:12px; color:var(--muted); padding:4px 0}
+  .reqitem{border:1px solid var(--hair); border-radius:11px; padding:9px 10px; background:var(--surface-2)}
+  .reqitem-top{display:flex; align-items:center; gap:7px; margin-bottom:6px}
+  .reqitem-name{font-size:12px; font-weight:700; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1}
+  .reqitem-m{font-size:11.5px; font-weight:800; color:var(--profit); flex:none}
+  .reqitem-x{border:0; background:none; color:var(--muted); cursor:pointer; font-size:15px; padding:0 2px; flex:none}
+  .reqmemo{width:100%; border:1px solid var(--hair); background:var(--surface); color:var(--ink); border-radius:8px;
+    padding:7px 9px; font-size:12px; font-family:inherit}
+  .reqmemo:focus{outline:2px solid var(--accent); outline-offset:1px}
+  .reqmemo::placeholder{color:var(--muted)}
+  .reqactions{display:flex; gap:8px; margin-top:2px}
+
+  .pin{margin-left:auto; border:1px solid var(--hair); background:var(--surface); color:var(--muted); cursor:pointer;
+    border-radius:8px; padding:3px 9px; font-size:11px; font-weight:700; font-family:inherit; display:inline-flex; align-items:center; gap:4px}
+  .pin.on{background:var(--accent); color:#fff; border-color:var(--accent)}
+  .rank+.pin{margin-left:8px}
+  .row-memo{margin-top:9px}
+  .row-memo input{width:100%; border:1px dashed var(--accent); background:var(--accent-soft); color:var(--ink);
+    border-radius:8px; padding:7px 9px; font-size:12px; font-family:inherit}
+  .row-memo input:focus{outline:2px solid var(--accent); outline-offset:1px}
+  .row-memo[hidden]{display:none}
+
   .kpis{display:grid; grid-template-columns:repeat(2,1fr); gap:9px; margin-bottom:16px}
   @media(min-width:560px){.kpis{grid-template-columns:repeat(4,1fr)}}
   .kpi{background:var(--surface); border:1px solid var(--hair); border-radius:14px; padding:12px 13px; box-shadow:var(--shadow)}
@@ -190,6 +228,23 @@
   </div>
 
   <div class="kpis" id="kpis"></div>
+
+  <section class="card reqbox" id="reqbox">
+    <button class="reqhead" id="reqtoggle" aria-expanded="false">
+      📋 내 요청 <span class="reqcount zero" id="reqcount">0</span>
+      <span class="chev">▾</span>
+    </button>
+    <div class="reqbody" id="reqbody" hidden>
+      <div class="reqlabel">자유 요청 · 상품과 무관한 것</div>
+      <textarea id="genreq" placeholder="예) 나이키 신상 조사일 추가해줘 · 마진율 20% 이상만 기본 필터로 · 수수료율 알려줄게 실수령 마진 넣어줘"></textarea>
+      <div class="reqlabel">담은 상품 <span id="reqitemcount"></span></div>
+      <div class="reqitems" id="reqitems"></div>
+      <div class="reqactions">
+        <button class="dbtn primary" id="reqexport">📤 요청 내보내기</button>
+        <button class="dbtn" id="reqclear">비우기</button>
+      </div>
+    </div>
+  </section>
 
   <div class="sec-h">
     <h2>기회 지도</h2>
@@ -318,7 +373,8 @@ window.ShoeXlsx = (function(){
       const r=rows[i]; if(!r||r[0]==null) continue;
       recs.push([ (''+(r[2]||'')).trim(), idx(brands,r[3]), idx(sites,r[4]),
         Math.round(num(r[5])), Math.round(num(r[6])), Math.round(num(r[8])),
-        Math.round(num(r[9])), Math.round(num(r[10])), Math.round(num(r[11])*10)/10 ]);
+        Math.round(num(r[9])), Math.round(num(r[10])), Math.round(num(r[11])*10)/10,
+        (''+(r[1]||'')).trim() ]);   // 9: 상품 코드
     }
     const pos=recs.filter(x=>x[7]>0);
     const m={ total:recs.length, arb:pos.length,
@@ -461,13 +517,17 @@ window.ShoeXlsx = (function(){
   function rowHTML(x,rank){
     const neg=x[7]<0;
     const dw = Math.max(2, Math.round(100*Math.log10(x[6]+1)/logMax));
-    return `<div class="row ${neg?'neg':''}">
+    const key=reqKey(x), on=!!reqItems[key];
+    const note=on?(reqItems[key].note||''):'';
+    return `<div class="row ${neg?'neg':''}" data-key="${escapeHtml(key)}">
       <div class="row-top">
         <span class="brand">${escapeHtml(B[x[1]])}</span>
         <span class="site">${escapeHtml(S[x[2]])}</span>
         <span class="rank">#${rank}</span>
+        <button class="pin ${on?'on':''}" data-act="pin" type="button">${on?'📌 담김':'📌 요청'}</button>
       </div>
       <p class="pname">${escapeHtml(x[0])}</p>
+      <div class="row-memo" ${on?'':'hidden'}><input data-act="memo" placeholder="메모: 이 상품에 뭘 요청할까요? (예: 수수료 반영 실수령 계산)" value="${escapeHtml(note)}"></div>
       <div class="flow">
         <div class="prices">
           <span class="price"><b>소싱</b><span class="v num">${wonPlain(x[3])}</span></span>
@@ -620,8 +680,89 @@ window.ShoeXlsx = (function(){
 
   $('foot').innerHTML='소싱가=국내 리테일 최저가 · 시장가=포이즌 거래 기준가 · 마진=시장가−소싱가(수수료·배송 제외)<br>수요=포이즌 누적 거래량 · 조사일별 스냅샷을 위에서 선택';
 
+  // ---------- 요청함 (상품별 📌 + 자유 메모) ----------
+  const REQ_KEY='shoeArb.requests.v1';
+  let reqItems={}, reqGeneral='';
+  (function(){ try{ const o=JSON.parse(localStorage.getItem(REQ_KEY))||{}; reqItems=o.items||{}; reqGeneral=o.general||''; }catch(e){} })();
+  function reqKey(x){ return x[9] ? 'c:'+x[9] : 'n:'+x[0]+'|'+S[x[2]]; }
+  function findRec(key){ return R.find(x=>reqKey(x)===key); }
+  function persistReq(){ try{ localStorage.setItem(REQ_KEY, JSON.stringify({items:reqItems, general:reqGeneral})); }catch(e){} }
+  let prt; function persistReqSoon(){ clearTimeout(prt); prt=setTimeout(persistReq,300); }
+
+  function renderReq(){
+    const keys=Object.keys(reqItems), c=$('reqcount');
+    c.textContent=keys.length; c.classList.toggle('zero',keys.length===0);
+    $('reqitemcount').textContent=keys.length?`(${keys.length})`:'';
+    const box=$('reqitems');
+    if(!keys.length){ box.innerHTML='<div class="reqempty">아직 담은 상품이 없어요. 아래 목록에서 📌 요청을 눌러 담으세요.</div>'; return; }
+    box.innerHTML=keys.map(k=>{ const it=reqItems[k];
+      return `<div class="reqitem" data-key="${escapeHtml(k)}">
+        <div class="reqitem-top">
+          <span class="reqitem-name">${escapeHtml(it.brand||'')} · ${escapeHtml(it.name||'')}</span>
+          <span class="reqitem-m num">${(it.margin>0?'+':'')}${(it.margin||0).toLocaleString()}</span>
+          <button class="reqitem-x" data-act="reqdel" type="button" aria-label="빼기">×</button>
+        </div>
+        <input class="reqmemo" data-act="reqmemo" placeholder="메모 (선택)" value="${escapeHtml(it.note||'')}">
+      </div>`; }).join('');
+  }
+  function setNote(key,val,src){
+    if(!reqItems[key]) return;
+    reqItems[key].note=val; persistReqSoon();
+    document.querySelectorAll('[data-act="memo"],[data-act="reqmemo"]').forEach(inp=>{
+      if(inp===src) return; const holder=inp.closest('[data-key]');
+      if(holder && holder.getAttribute('data-key')===key && inp.value!==val) inp.value=val;
+    });
+  }
+  function togglePin(x){
+    const key=reqKey(x);
+    if(reqItems[key]) delete reqItems[key];
+    else reqItems[key]={code:x[9]||'', name:x[0], brand:B[x[1]], site:S[x[2]], margin:x[7], vol:x[6], mpct:x[8], snapshot:curDate, note:''};
+    persistReq(); paint(); renderReq();
+  }
+
+  listEl.addEventListener('click',e=>{
+    const pin=e.target.closest('[data-act="pin"]'); if(!pin) return;
+    const key=pin.closest('.row').getAttribute('data-key'); const x=findRec(key); if(x) togglePin(x);
+  });
+  listEl.addEventListener('input',e=>{
+    const m=e.target.closest('[data-act="memo"]'); if(!m) return;
+    setNote(m.closest('.row').getAttribute('data-key'), m.value, m);
+  });
+  $('reqitems').addEventListener('click',e=>{
+    const del=e.target.closest('[data-act="reqdel"]'); if(!del) return;
+    const key=del.closest('.reqitem').getAttribute('data-key');
+    delete reqItems[key]; persistReq(); paint(); renderReq();
+  });
+  $('reqitems').addEventListener('input',e=>{
+    const m=e.target.closest('[data-act="reqmemo"]'); if(!m) return;
+    setNote(m.closest('.reqitem').getAttribute('data-key'), m.value, m);
+  });
+  $('reqtoggle').addEventListener('click',()=>{
+    const open=$('reqbox').classList.toggle('open');
+    $('reqbody').hidden=!open; $('reqtoggle').setAttribute('aria-expanded',open); if(open) renderReq();
+  });
+  const genEl=$('genreq'); genEl.value=reqGeneral;
+  genEl.addEventListener('input',()=>{ reqGeneral=genEl.value; persistReqSoon(); });
+
+  $('reqexport').addEventListener('click',()=>{
+    const items=Object.values(reqItems);
+    const general=reqGeneral.split('\n').map(s=>s.trim()).filter(Boolean);
+    if(!items.length && !general.length){ alert('담은 상품이나 자유 요청이 없어요.'); return; }
+    const payload={tool:'shoe-arbitrage', kind:'requests', exportedAt:new Date().toISOString(),
+      snapshot:curDate, generalRequests:general, items};
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+    a.download=`requests-${curDate}.json`; a.click(); URL.revokeObjectURL(a.href);
+    msg(`requests-${curDate}.json 내려받음 · 이 파일을 나에게 주세요`,'ok');
+  });
+  $('reqclear').addEventListener('click',()=>{
+    if(!confirm('담은 상품과 자유 요청을 모두 비울까요?')) return;
+    reqItems={}; reqGeneral=''; genEl.value=''; persistReq(); paint(); renderReq();
+  });
+
   // init
   refreshSnapSelect();
+  renderReq();
   loadSnapshot(curDate);
   window.addEventListener('resize',resize);
   resize();
