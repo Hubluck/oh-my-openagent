@@ -1,0 +1,419 @@
+<title>신발 아비트리지 보드 · 포이즌 × 리테일</title>
+<style>
+  :root{
+    --plane:#efeee9; --surface:#ffffff; --surface-2:#f7f6f2;
+    --ink:#16150f; --ink-2:#57564e; --muted:#8b8a80;
+    --hair:#e4e2da; --ring:rgba(20,21,15,.08);
+    --accent:#1f6feb; --accent-soft:rgba(31,111,235,.10);
+    --profit:#0a8f0a; --profit-soft:rgba(10,143,10,.10);
+    --loss:#cf3b3b; --loss-soft:rgba(207,59,59,.10);
+    --chip:#f0efe9; --chipink:#3b3a33;
+    --shadow:0 1px 2px rgba(20,21,15,.05),0 8px 24px rgba(20,21,15,.05);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --plane:#0c0c0b; --surface:#161615; --surface-2:#1e1e1c;
+      --ink:#f4f3ec; --ink-2:#b8b7ac; --muted:#8a897f;
+      --hair:#2a2a27; --ring:rgba(255,255,255,.09);
+      --accent:#4b90ff; --accent-soft:rgba(75,144,255,.14);
+      --profit:#39c23a; --profit-soft:rgba(57,194,58,.14);
+      --loss:#f06a6a; --loss-soft:rgba(240,106,106,.13);
+      --chip:#232320; --chipink:#cfcec3;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"]{
+    --plane:#efeee9; --surface:#ffffff; --surface-2:#f7f6f2;
+    --ink:#16150f; --ink-2:#57564e; --muted:#8b8a80;
+    --hair:#e4e2da; --ring:rgba(20,21,15,.08);
+    --accent:#1f6feb; --accent-soft:rgba(31,111,235,.10);
+    --profit:#0a8f0a; --profit-soft:rgba(10,143,10,.10);
+    --loss:#cf3b3b; --loss-soft:rgba(207,59,59,.10);
+    --chip:#f0efe9; --chipink:#3b3a33;
+    --shadow:0 1px 2px rgba(20,21,15,.05),0 8px 24px rgba(20,21,15,.05);
+  }
+  :root[data-theme="dark"]{
+    --plane:#0c0c0b; --surface:#161615; --surface-2:#1e1e1c;
+    --ink:#f4f3ec; --ink-2:#b8b7ac; --muted:#8a897f;
+    --hair:#2a2a27; --ring:rgba(255,255,255,.09);
+    --accent:#4b90ff; --accent-soft:rgba(75,144,255,.14);
+    --profit:#39c23a; --profit-soft:rgba(57,194,58,.14);
+    --loss:#f06a6a; --loss-soft:rgba(240,106,106,.13);
+    --chip:#232320; --chipink:#cfcec3;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--plane); color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    -webkit-font-smoothing:antialiased; line-height:1.45;
+  }
+  .num{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-variant-numeric:tabular-nums; letter-spacing:-.02em}
+  .wrap{max-width:760px; margin:0 auto; padding:16px 14px 60px}
+
+  header.top{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:14px}
+  .eyebrow{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); font-weight:700}
+  h1{font-size:22px; line-height:1.15; margin:4px 0 4px; font-weight:800; letter-spacing:-.02em; text-wrap:balance}
+  .sub{font-size:12.5px; color:var(--ink-2)}
+  .head-r{flex:none; display:flex; flex-direction:column; align-items:flex-end; gap:8px}
+  .themebtn{border:1px solid var(--hair); background:var(--surface); color:var(--ink-2);
+    width:38px; height:38px; border-radius:11px; font-size:16px; cursor:pointer; display:grid; place-items:center}
+  .themebtn:active{transform:scale(.95)}
+  .snapsel{border:1px solid var(--hair); background:var(--surface); color:var(--ink); border-radius:11px;
+    padding:8px 30px 8px 11px; font-size:12.5px; font-family:inherit; font-weight:700; cursor:pointer;
+    -webkit-appearance:none; appearance:none; max-width:150px;
+    background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+    background-position:calc(100% - 15px) 55%,calc(100% - 10px) 55%; background-size:5px 5px,5px 5px; background-repeat:no-repeat}
+
+  .kpis{display:grid; grid-template-columns:repeat(2,1fr); gap:9px; margin-bottom:16px}
+  @media(min-width:560px){.kpis{grid-template-columns:repeat(4,1fr)}}
+  .kpi{background:var(--surface); border:1px solid var(--hair); border-radius:14px; padding:12px 13px; box-shadow:var(--shadow)}
+  .kpi .lab{font-size:11px; color:var(--muted); font-weight:600; letter-spacing:.02em}
+  .kpi .val{font-size:22px; font-weight:800; margin-top:3px}
+  .kpi .val.small{font-size:19px}
+  .kpi .val.pos{color:var(--profit)}
+  .kpi .delta{font-size:11px; font-weight:700; margin-top:2px}
+  .kpi .delta.up{color:var(--profit)} .kpi .delta.down{color:var(--loss)} .kpi .delta.flat{color:var(--muted)}
+
+  .card{background:var(--surface); border:1px solid var(--hair); border-radius:16px; box-shadow:var(--shadow)}
+  .sec-h{display:flex; align-items:baseline; justify-content:space-between; gap:8px; margin:22px 2px 10px}
+  .sec-h h2{font-size:15px; font-weight:800; margin:0; letter-spacing:-.01em}
+  .sec-h .hint{font-size:11.5px; color:var(--muted)}
+
+  .mapwrap{padding:12px 12px 10px}
+  .mapcanvas-box{position:relative; width:100%; height:260px}
+  canvas{display:block; width:100%; height:100%; touch-action:pan-y}
+  .axhint{display:flex; justify-content:space-between; font-size:10.5px; color:var(--muted); margin-top:6px; padding:0 2px}
+  .readout{min-height:40px; margin-top:8px; padding:9px 11px; border-radius:11px; background:var(--surface-2);
+    border:1px solid var(--hair); font-size:12px; color:var(--ink-2); display:flex; align-items:center; gap:9px}
+  .readout.empty{color:var(--muted)}
+  .readout b{color:var(--ink)}
+
+  .controls{display:flex; flex-direction:column; gap:10px; position:sticky; top:0; z-index:5;
+    background:var(--plane); padding:8px 14px 9px; margin:0 -14px}
+  .searchrow{display:flex; gap:8px}
+  .search{flex:1; display:flex; align-items:center; gap:7px; background:var(--surface); border:1px solid var(--hair);
+    border-radius:12px; padding:9px 12px}
+  .search input{border:0; background:none; outline:none; color:var(--ink); font-size:14px; width:100%; font-family:inherit}
+  .search input::placeholder{color:var(--muted)}
+  .search .ic{color:var(--muted); font-size:14px}
+  select.sortsel{border:1px solid var(--hair); background:var(--surface); color:var(--ink); border-radius:12px;
+    padding:9px 10px; font-size:13px; font-family:inherit; font-weight:600; -webkit-appearance:none; appearance:none;
+    background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+    background-position:calc(100% - 15px) 55%,calc(100% - 10px) 55%; background-size:5px 5px,5px 5px; background-repeat:no-repeat; padding-right:30px}
+  .chiprow{display:flex; gap:7px; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:2px; scrollbar-width:none}
+  .chiprow::-webkit-scrollbar{display:none}
+  .chip{flex:none; border:1px solid var(--hair); background:var(--chip); color:var(--chipink); border-radius:999px;
+    padding:6px 13px; font-size:12.5px; font-weight:600; cursor:pointer; white-space:nowrap; transition:.12s}
+  .chip.on{background:var(--ink); color:var(--surface); border-color:var(--ink)}
+  .chip .n{opacity:.55; font-weight:600; margin-left:5px; font-size:11px}
+  .toggle{display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--ink-2); font-weight:600; cursor:pointer; user-select:none}
+  .toggle .sw{width:36px; height:21px; border-radius:999px; background:var(--hair); position:relative; transition:.15s; flex:none}
+  .toggle .sw::after{content:""; position:absolute; top:2px; left:2px; width:17px; height:17px; border-radius:50%; background:#fff; transition:.15s; box-shadow:0 1px 2px rgba(0,0,0,.3)}
+  .toggle.on .sw{background:var(--profit)}
+  .toggle.on .sw::after{left:17px}
+  .countline{font-size:12px; color:var(--muted); margin:2px 2px 10px; display:flex; justify-content:space-between}
+
+  .list{display:flex; flex-direction:column; gap:10px}
+  .row{background:var(--surface); border:1px solid var(--hair); border-radius:15px; padding:13px 14px; box-shadow:var(--shadow);
+    position:relative; overflow:hidden}
+  .row::before{content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--profit)}
+  .row.neg::before{background:var(--loss)}
+  .row-top{display:flex; align-items:center; gap:7px; margin-bottom:7px; flex-wrap:wrap}
+  .brand{font-size:11px; font-weight:800; letter-spacing:.02em; padding:3px 8px; border-radius:7px; background:var(--accent-soft); color:var(--accent)}
+  .site{font-size:11px; color:var(--muted); font-weight:600}
+  .rank{margin-left:auto; font-size:11px; color:var(--muted); font-weight:700}
+  .pname{font-size:13.5px; font-weight:600; line-height:1.35; margin:0 0 10px; color:var(--ink)}
+  .flow{display:flex; align-items:flex-end; justify-content:space-between; gap:10px}
+  .prices{display:flex; align-items:center; gap:9px; font-size:12px; color:var(--ink-2); flex-wrap:wrap}
+  .price b{display:block; font-size:9.5px; color:var(--muted); font-weight:700; letter-spacing:.04em; text-transform:uppercase; margin-bottom:1px}
+  .price .v{font-size:14px; font-weight:700; color:var(--ink)}
+  .arrow{color:var(--muted); font-size:15px; padding-bottom:1px}
+  .marg{text-align:right; flex:none}
+  .marg .m{font-size:19px; font-weight:800; color:var(--profit)}
+  .marg .p{font-size:11.5px; font-weight:700; color:var(--profit)}
+  .row.neg .marg .m,.row.neg .marg .p{color:var(--loss)}
+  .demand{display:flex; align-items:center; gap:7px; margin-top:11px}
+  .demand .dl{font-size:10.5px; color:var(--muted); font-weight:700; flex:none}
+  .dbar{flex:1; height:6px; border-radius:999px; background:var(--surface-2); overflow:hidden}
+  .dbar i{display:block; height:100%; border-radius:999px; background:var(--accent)}
+  .dval{font-size:11.5px; font-weight:700; color:var(--ink-2); flex:none}
+  .dval.zero{color:var(--muted)}
+
+  .more{margin:16px auto 0; display:block; border:1px solid var(--hair); background:var(--surface); color:var(--ink);
+    border-radius:12px; padding:12px 22px; font-size:14px; font-weight:700; cursor:pointer; box-shadow:var(--shadow)}
+  .more:active{transform:scale(.98)}
+  .empty-list{text-align:center; color:var(--muted); padding:40px 0; font-size:13px}
+  .foot{margin-top:26px; font-size:11px; color:var(--muted); text-align:center; line-height:1.6}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:8px}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">포이즌 × 리테일 · 아비트리지</div>
+      <h1>사서 팔면 남는 신발</h1>
+      <div class="sub" id="subline"></div>
+    </div>
+    <div class="head-r">
+      <button class="themebtn" id="themebtn" aria-label="테마 전환">◐</button>
+      <select class="snapsel" id="snapsel" aria-label="조사일 선택"></select>
+    </div>
+  </header>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="sec-h">
+    <h2>기회 지도</h2>
+    <span class="hint">오른쪽 위 = 꿀</span>
+  </div>
+  <div class="card mapwrap">
+    <div class="mapcanvas-box"><canvas id="map"></canvas></div>
+    <div class="axhint"><span>← 수요 적음</span><span>수요 많음 →</span></div>
+    <div class="readout empty" id="readout">점을 눌러 상품을 확인하세요 · 세로=마진, 가로=수요(거래량)</div>
+  </div>
+
+  <div class="sec-h">
+    <h2>기회 목록</h2>
+  </div>
+
+  <div class="controls">
+    <div class="searchrow">
+      <label class="search">
+        <span class="ic">⌕</span>
+        <input id="q" type="search" placeholder="상품·브랜드 검색" autocomplete="off">
+      </label>
+      <select class="sortsel" id="sort">
+        <option value="score">추천순 (마진×수요)</option>
+        <option value="margin">마진 큰 순</option>
+        <option value="mpct">마진율 높은 순</option>
+        <option value="vol">수요 많은 순</option>
+      </select>
+    </div>
+    <div class="chiprow" id="chips"></div>
+    <label class="toggle on" id="posonly">
+      <span class="sw"></span><span>마진 남는 것만</span>
+    </label>
+  </div>
+
+  <div class="countline"><span id="count"></span><span id="showing"></span></div>
+  <div class="list" id="list"></div>
+  <button class="more" id="more" hidden>더 보기</button>
+  <div class="foot" id="foot"></div>
+</div>
+
+<!--DATA-->
+<script>
+(function(){
+  const DB = window.DATA;                       // {dates, latest, snaps:{date:{b,s,r,m}}}
+  let B,S,R,M, maxVol, logMax, brandCount, brandOrder;
+  let curDate = DB.latest;
+  let posOnly=true, sortKey='score', query='', activeBrand=-1;
+  let filtered=[], shown=0; const PAGE=30;
+
+  const $ = id => document.getElementById(id);
+  const won = n => '₩'+Math.round(n).toLocaleString('ko-KR');
+  const wonPlain = n => Math.round(n).toLocaleString('ko-KR');
+  const signed = n => (n>0?'+':'')+wonPlain(n);
+  function demandFmt(v){
+    if(v>=100000000) return (v/100000000).toFixed(v>=1000000000?0:1).replace(/\.0$/,'')+'억';
+    if(v>=10000) return Math.round(v/10000).toLocaleString('ko-KR')+'만';
+    return v.toLocaleString('ko-KR');
+  }
+  const score = x => x[7] * (1 + Math.log10(x[6]+10));
+  function escapeHtml(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+  // ---------- snapshot loading ----------
+  function loadSnapshot(date){
+    const snap = DB.snaps[date]; if(!snap) return;
+    curDate=date; B=snap.b; S=snap.s; R=snap.r; M=snap.m;
+    maxVol = R.reduce((a,x)=>Math.max(a,x[6]),0);
+    logMax = Math.log10(maxVol+1) || 1;
+    brandCount={}; R.forEach(x=>{brandCount[x[1]]=(brandCount[x[1]]||0)+1;});
+    brandOrder=B.map((_,i)=>i).sort((a,b)=>(brandCount[b]||0)-(brandCount[a]||0));
+    activeBrand=-1;
+    renderSub(); renderKpis(); renderChips(); apply();
+  }
+
+  function prevSnap(){
+    const i=DB.dates.indexOf(curDate);
+    return i>0 ? DB.snaps[DB.dates[i-1]] : null;
+  }
+
+  function renderSub(){
+    const n=DB.dates.length;
+    $('subline').innerHTML = `<b>${curDate}</b> 기준 · 매칭 ${M.total.toLocaleString()}건`
+      + (n>1?` · 스냅샷 ${n}개`:'');
+  }
+
+  function renderKpis(){
+    const prev=prevSnap();
+    function delta(cur, key, money){
+      if(!prev||prev.m[key]==null) return '';
+      const d=cur-prev.m[key];
+      if(d===0) return `<div class="delta flat">= 지난 조사일과 동일</div>`;
+      const cls=d>0?'up':'down';
+      const v=money?won(Math.abs(d)):Math.abs(d).toLocaleString();
+      return `<div class="delta ${cls}">${d>0?'▲':'▼'} ${v}</div>`;
+    }
+    const cards=[
+      {lab:'매칭 상품', val:M.total.toLocaleString(), cls:'', d:delta(M.total,'total',false)},
+      {lab:'마진 나는 건', val:M.arb.toLocaleString(), cls:'pos', d:delta(M.arb,'arb',false)},
+      {lab:'평균 마진(＋)', val:won(M.avgMargin), cls:'pos small', d:delta(M.avgMargin,'avgMargin',true)},
+      {lab:'최고 마진', val:won(M.bestMargin), cls:'pos small', d:delta(M.bestMargin,'bestMargin',true)},
+    ];
+    $('kpis').innerHTML = cards.map(k=>
+      `<div class="kpi"><div class="lab">${k.lab}</div><div class="val ${k.cls}">${k.val}</div>${k.d}</div>`).join('');
+  }
+
+  const chipsEl=$('chips');
+  function renderChips(){
+    let html=`<button class="chip ${activeBrand===-1?'on':''}" data-b="-1">전체</button>`;
+    html+=brandOrder.map(i=>`<button class="chip ${activeBrand===i?'on':''}" data-b="${i}">${escapeHtml(B[i])}<span class="n">${brandCount[i]}</span></button>`).join('');
+    chipsEl.innerHTML=html;
+  }
+  chipsEl.addEventListener('click',e=>{
+    const b=e.target.closest('.chip'); if(!b)return;
+    activeBrand=+b.dataset.b; renderChips(); apply();
+  });
+
+  // ---------- filtering / list ----------
+  function currentFilter(){
+    let f=R.filter(x=>{
+      if(posOnly && x[7]<=0) return false;
+      if(activeBrand>=0 && x[1]!==activeBrand) return false;
+      if(query && !((x[0]||'').toLowerCase().includes(query) || (B[x[1]]||'').toLowerCase().includes(query))) return false;
+      return true;
+    });
+    const cmp={
+      score:(a,b)=>score(b)-score(a),
+      margin:(a,b)=>b[7]-a[7],
+      mpct:(a,b)=>b[8]-a[8],
+      vol:(a,b)=>b[6]-a[6],
+    }[sortKey];
+    f.sort(cmp);
+    return f;
+  }
+
+  function rowHTML(x,rank){
+    const neg=x[7]<0;
+    const dw = Math.max(2, Math.round(100*Math.log10(x[6]+1)/logMax));
+    return `<div class="row ${neg?'neg':''}">
+      <div class="row-top">
+        <span class="brand">${escapeHtml(B[x[1]])}</span>
+        <span class="site">${escapeHtml(S[x[2]])}</span>
+        <span class="rank">#${rank}</span>
+      </div>
+      <p class="pname">${escapeHtml(x[0])}</p>
+      <div class="flow">
+        <div class="prices">
+          <span class="price"><b>소싱</b><span class="v num">${wonPlain(x[3])}</span></span>
+          <span class="arrow">→</span>
+          <span class="price"><b>시장</b><span class="v num">${wonPlain(x[5])}</span></span>
+        </div>
+        <div class="marg">
+          <div class="m num">${signed(x[7])}</div>
+          <div class="p num">${x[8]>0?'+':''}${x[8]}%</div>
+        </div>
+      </div>
+      <div class="demand">
+        <span class="dl">수요</span>
+        <span class="dbar"><i style="width:${x[6]===0?0:dw}%"></i></span>
+        <span class="dval${x[6]===0?' zero':''} num">${x[6]===0?'거래 없음':demandFmt(x[6])}</span>
+      </div>
+    </div>`;
+  }
+
+  const listEl=$('list'), moreEl=$('more');
+  moreEl.addEventListener('click',()=>{shown+=PAGE; paint();});
+  function paint(){
+    const slice=filtered.slice(0,shown);
+    if(slice.length===0){listEl.innerHTML='<div class="empty-list">조건에 맞는 상품이 없어요.<br>검색어나 브랜드 필터를 바꿔보세요.</div>';}
+    else listEl.innerHTML=slice.map((x,i)=>rowHTML(x,i+1)).join('');
+    moreEl.hidden = shown>=filtered.length;
+    $('showing').textContent = filtered.length? `${Math.min(shown,filtered.length).toLocaleString()} / ${filtered.length.toLocaleString()}건 표시` : '';
+  }
+  function apply(){
+    filtered=currentFilter(); shown=PAGE;
+    $('count').textContent = `${filtered.length.toLocaleString()}개 상품`;
+    paint(); drawMap();
+  }
+
+  // ---------- opportunity map ----------
+  const cv=$('map'), ctx=cv.getContext('2d'), readout=$('readout');
+  let pts=[], W=0,H=0,dpr=1;
+  const PAD={l:38,r:12,t:14,b:8};
+  const cssvar=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+  function resize(){
+    const box=cv.parentElement.getBoundingClientRect();
+    dpr=Math.min(window.devicePixelRatio||1,2); W=box.width; H=box.height;
+    cv.width=W*dpr; cv.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); drawMap();
+  }
+  function drawMap(){
+    if(!W||!R) return;
+    const plotData=(filtered.length?filtered:R).filter(x=>x[7]>0);
+    ctx.clearRect(0,0,W,H);
+    const muted=cssvar('--muted'), hair=cssvar('--hair'), profit=cssvar('--profit'), accent=cssvar('--accent');
+    const maxM=Math.max(50000, ...plotData.map(x=>x[7]));
+    const plotW=W-PAD.l-PAD.r, plotH=H-PAD.t-PAD.b;
+    const X=v=>PAD.l+plotW*(Math.log10(v+1)/logMax);
+    const Y=v=>PAD.t+plotH*(1-Math.min(v,maxM)/maxM);
+    const zx=X(maxVol*0.02), zy=Y(maxM*0.55);
+    ctx.fillStyle=cssvar('--profit-soft'); ctx.fillRect(zx,PAD.t,(W-PAD.r)-zx,zy-PAD.t);
+    ctx.strokeStyle=hair; ctx.lineWidth=1; ctx.fillStyle=muted;
+    ctx.font='10px ui-monospace,Menlo,monospace'; ctx.textAlign='right'; ctx.textBaseline='middle';
+    for(let i=0;i<=3;i++){const val=maxM*i/3, yy=Y(val);
+      ctx.beginPath(); ctx.moveTo(PAD.l,yy); ctx.lineTo(W-PAD.r,yy); ctx.stroke();
+      ctx.fillText(val>=10000?Math.round(val/10000)+'만':'0', PAD.l-6, yy);}
+    pts=[];
+    for(const x of plotData){
+      const px=X(x[6]), py=Y(x[7]);
+      const big = x[7]>maxM*0.4 && x[6]>maxVol*0.01;
+      ctx.beginPath(); ctx.arc(px,py,x[6]===0?2.4:3.2,0,7);
+      ctx.fillStyle=big?profit:accent; ctx.globalAlpha=x[6]===0?0.32:0.72; ctx.fill();
+      pts.push([px,py,x]);
+    }
+    ctx.globalAlpha=1; ctx.fillStyle=profit; ctx.font='700 10px system-ui';
+    ctx.textAlign='right'; ctx.textBaseline='top'; ctx.fillText('꿀 존', W-PAD.r-4, PAD.t+4);
+  }
+  cv.addEventListener('pointerdown',e=>{
+    const rect=cv.getBoundingClientRect(), mx=e.clientX-rect.left, my=e.clientY-rect.top;
+    let best=null,bd=1e9;
+    for(const p of pts){const d=(p[0]-mx)**2+(p[1]-my)**2; if(d<bd){bd=d;best=p;}}
+    if(best&&bd<900){
+      const x=best[2]; readout.classList.remove('empty');
+      readout.innerHTML=`<b>${escapeHtml(x[0].slice(0,42))}${x[0].length>42?'…':''}</b>`+
+        `<span style="margin-left:auto;white-space:nowrap"><b style="color:var(--profit)">${signed(x[7])}</b> · 수요 ${x[6]===0?'0':demandFmt(x[6])}</span>`;
+      drawMap();
+      ctx.beginPath(); ctx.arc(best[0],best[1],6,0,7); ctx.lineWidth=2; ctx.strokeStyle=cssvar('--ink'); ctx.stroke();
+    }
+  });
+
+  // ---------- controls wiring ----------
+  $('posonly').addEventListener('click',()=>{posOnly=!posOnly; $('posonly').classList.toggle('on',posOnly); apply();});
+  $('sort').addEventListener('change',e=>{sortKey=e.target.value; apply();});
+  let qt; $('q').addEventListener('input',e=>{clearTimeout(qt); qt=setTimeout(()=>{query=e.target.value.trim().toLowerCase(); apply();},140);});
+
+  const snapEl=$('snapsel');
+  snapEl.innerHTML=DB.dates.slice().reverse().map(d=>`<option value="${d}"${d===curDate?' selected':''}>${d}</option>`).join('');
+  snapEl.addEventListener('change',e=>loadSnapshot(e.target.value));
+
+  $('themebtn').addEventListener('click',()=>{
+    const cur=document.documentElement.getAttribute('data-theme');
+    const isDark=cur?cur==='dark':matchMedia('(prefers-color-scheme:dark)').matches;
+    document.documentElement.setAttribute('data-theme', isDark?'light':'dark'); drawMap();
+  });
+  matchMedia('(prefers-color-scheme:dark)').addEventListener('change',drawMap);
+
+  $('foot').innerHTML='소싱가=국내 리테일 최저가 · 시장가=포이즌 거래 기준가 · 마진=시장가−소싱가(수수료·배송 제외)<br>수요=포이즌 누적 거래량 · 조사일별 스냅샷을 위에서 선택';
+
+  // init
+  loadSnapshot(curDate);
+  window.addEventListener('resize',resize);
+  resize();
+})();
+</script>
