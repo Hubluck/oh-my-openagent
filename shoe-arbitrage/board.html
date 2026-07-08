@@ -301,9 +301,11 @@
       <label class="toggle" id="dedupe"><span class="sw"></span><span>품번당 최저가만</span></label>
     </div>
     <div class="feerow">
-      <span class="fl">실수령 계산</span>
-      <label>수수료 <input id="feePct" type="number" min="0" max="100" step="0.5" placeholder="0" inputmode="decimal">%</label>
-      <label>배송 <input id="feeShip" type="number" min="0" step="500" placeholder="0" inputmode="numeric">원</label>
+      <label class="toggle on" id="feeon"><span class="sw"></span><span>포이즌 수수료 반영</span></label>
+      <label>요율 <input id="feeRate" type="number" min="0" step="0.5" inputmode="decimal">%</label>
+      <label>최소 <input id="feeFloor" type="number" min="0" step="1000" inputmode="numeric"></label>
+      <label>최대 <input id="feeCap" type="number" min="0" step="1000" inputmode="numeric"></label>
+      <label>추가 <input id="feeExtra" type="number" min="0" step="500" inputmode="numeric">원</label>
     </div>
   </div>
 
@@ -467,13 +469,15 @@ window.ShoeXlsx = (function(){
     if(v>=10000) return Math.round(v/10000).toLocaleString('ko-KR')+'만';
     return v.toLocaleString('ko-KR');
   }
-  // 실수령 마진: 시장가에서 수수료율·배송비·소싱가를 뺀 값 (설정 없으면 = 총마진)
-  const FEE_KEY='shoeArb.fees.v1';
-  let feePct=0, feeShip=0, dedupe=false;
-  (function(){ try{ const o=JSON.parse(localStorage.getItem(FEE_KEY))||{}; feePct=+o.feePct||0; feeShip=+o.feeShip||0; }catch(e){} })();
-  function feesActive(){ return feePct>0 || feeShip>0; }
-  function netMargin(x){ return Math.round(x[5]*(1-feePct/100) - feeShip - x[3]); }
-  function effMargin(x){ return feesActive()? netMargin(x) : x[7]; }
+  // 실수령 마진: 포이즌 수수료(신발 10%, 하한 15000, 상한 45000)를 판매가에서 뺀 값
+  const FEE_KEY='shoeArb.fees.v2';
+  let feeOn=true, feeRate=10, feeFloor=15000, feeCap=45000, feeExtra=0, dedupe=false;
+  (function(){ try{ const o=JSON.parse(localStorage.getItem(FEE_KEY)); if(o){ feeOn=o.feeOn!==false;
+    feeRate=o.feeRate??10; feeFloor=o.feeFloor??15000; feeCap=o.feeCap??45000; feeExtra=o.feeExtra??0; } }catch(e){} })();
+  function feesActive(){ return feeOn; }
+  function poizonFee(p){ return Math.min(feeCap, Math.max(feeFloor, Math.round(p*feeRate/100))); }
+  function netMargin(x){ return Math.round(x[5] - poizonFee(x[5]) - feeExtra - x[3]); }
+  function effMargin(x){ return feeOn ? netMargin(x) : x[7]; }
   function effMpct(x){ const m=effMargin(x); return x[5]? Math.round(m/x[5]*1000)/10 : 0; }
   const score = x => { const m=effMargin(x); return m * (1 + Math.log10(x[6]+10)); };
   function statsOf(recs){
@@ -685,11 +689,13 @@ window.ShoeXlsx = (function(){
   $('dedupe').addEventListener('click',()=>{dedupe=!dedupe; $('dedupe').classList.toggle('on',dedupe); apply();});
   $('sort').addEventListener('change',e=>{sortKey=e.target.value; apply();});
 
-  const feePctEl=$('feePct'), feeShipEl=$('feeShip');
-  if(feePct) feePctEl.value=feePct; if(feeShip) feeShipEl.value=feeShip;
-  function saveFees(){ try{ localStorage.setItem(FEE_KEY, JSON.stringify({feePct,feeShip})); }catch(e){} }
-  feePctEl.addEventListener('input',()=>{ feePct=Math.max(0,Math.min(100,+feePctEl.value||0)); saveFees(); renderKpis(); apply(); });
-  feeShipEl.addEventListener('input',()=>{ feeShip=Math.max(0,+feeShipEl.value||0); saveFees(); renderKpis(); apply(); });
+  const feeonEl=$('feeon'), fRate=$('feeRate'), fFloor=$('feeFloor'), fCap=$('feeCap'), fExtra=$('feeExtra');
+  fRate.value=feeRate; fFloor.value=feeFloor; fCap.value=feeCap; fExtra.value=feeExtra; feeonEl.classList.toggle('on',feeOn);
+  function saveFees(){ try{ localStorage.setItem(FEE_KEY, JSON.stringify({feeOn,feeRate,feeFloor,feeCap,feeExtra})); }catch(e){} }
+  feeonEl.addEventListener('click',()=>{ feeOn=!feeOn; feeonEl.classList.toggle('on',feeOn); saveFees(); renderKpis(); apply(); });
+  function feeInput(){ feeRate=Math.max(0,+fRate.value||0); feeFloor=Math.max(0,+fFloor.value||0);
+    feeCap=Math.max(0,+fCap.value||0); feeExtra=Math.max(0,+fExtra.value||0); saveFees(); renderKpis(); apply(); }
+  [fRate,fFloor,fCap,fExtra].forEach(el=>el.addEventListener('input',feeInput));
   let qt; $('q').addEventListener('input',e=>{clearTimeout(qt); qt=setTimeout(()=>{query=e.target.value.trim().toLowerCase(); apply();},140);});
 
   const snapEl=$('snapsel');
