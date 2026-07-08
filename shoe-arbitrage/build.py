@@ -104,20 +104,45 @@ def ingest(xlsx_path, date=None):
     return date
 
 
-def sync():
-    """data/raw/*.xlsx 중 아직 스냅샷이 없는 조사일을 전부 ingest 후 build."""
-    raws = sorted(glob.glob(os.path.join(RAW_DIR, "*.xlsx")))
-    if not raws:
-        raise SystemExit(f"!! {os.path.relpath(RAW_DIR, HERE)}/ 에 엑셀이 없습니다. 원본을 넣고 다시 실행하세요.")
+def _peek_date(xlsx):
+    """전체 파싱 없이 조사일만 추정 (파일명 → 요약시트 순)."""
+    m = re.search(r"(20\d{2})-?(\d{2})-?(\d{2})", os.path.basename(xlsx))
+    if m:
+        return f"{m.group(1)}-{m.group(2)}-{m.group(3)}"
+    try:
+        import openpyxl
+        wb = openpyxl.load_workbook(xlsx, data_only=True, read_only=True)
+        d = _detect_date(wb, None)
+        wb.close()
+        return d
+    except Exception:
+        return None
+
+
+def sync(from_dir=None, pattern="*.xlsx"):
+    """새 조사일 엑셀을 전부 ingest 후 build.
+    - data/raw/ 안의 엑셀은 항상 확인
+    - from_dir 지정 시 그 폴더(감시 폴더)의 새 엑셀도 끌어와 처리 (매일 크론용)
+    """
     done = {os.path.splitext(os.path.basename(p))[0] for p in glob.glob(os.path.join(DATA_DIR, "*.json"))}
     added = 0
-    for xlsx in raws:
-        stem = os.path.splitext(os.path.basename(xlsx))[0]
-        forced = stem if re.fullmatch(r"20\d{2}-\d{2}-\d{2}", stem) else None
-        if forced and forced in done:
-            continue
-        date = ingest(xlsx, forced)
-        done.add(date); added += 1
+
+    candidates = []
+    if from_dir:
+        candidates += sorted(glob.glob(os.path.join(os.path.expanduser(from_dir), pattern)))
+    candidates += sorted(glob.glob(os.path.join(RAW_DIR, "*.xlsx")))
+
+    for xlsx in candidates:
+        date = _peek_date(xlsx)
+        if date and date in done:
+            continue  # 이미 반영된 조사일 — 건너뜀
+        try:
+            date = ingest(xlsx, date)          # raw로 복사 + 스냅샷 저장
+            done.add(date)
+            added += 1
+        except Exception as e:
+            print(f"[skip]   {os.path.basename(xlsx)} — {e}")
+
     if added == 0:
         print("[sync]   새로 추가할 엑셀 없음 — 최신 상태.")
     build()
@@ -152,7 +177,9 @@ def main():
     pi.add_argument("--date", help="조사일 YYYY-MM-DD (미지정 시 자동 감지)")
     pi.add_argument("--no-build", action="store_true", help="ingest만 하고 build 생략")
     sub.add_parser("build", help="스냅샷들로 board.html 생성")
-    sub.add_parser("sync", help="data/raw/*.xlsx 자동 ingest + build (원클릭)")
+    ps = sub.add_parser("sync", help="새 엑셀 자동 ingest + build (크론용)")
+    ps.add_argument("--from", dest="from_dir", help="감시 폴더 — 이 폴더의 새 엑셀도 끌어옴")
+    ps.add_argument("--pattern", default="*.xlsx", help="감시 폴더 파일 패턴 (기본 *.xlsx)")
     args = ap.parse_args()
 
     if args.cmd == "ingest":
@@ -162,7 +189,7 @@ def main():
     elif args.cmd == "build":
         build()
     elif args.cmd == "sync":
-        sync()
+        sync(args.from_dir, args.pattern)
     else:
         ap.print_help()
 

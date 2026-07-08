@@ -40,6 +40,32 @@ python build.py sync
 
 > A로 폰에서 만든 `<조사일>.json`을 `data/`에 넣은 경우엔 `python build.py build`만 하면 board.html에 합쳐진다.
 
+### C. 매일 자동 업데이트 (PC 크론 · AI 사용량 무관)
+
+매일 특정 시각(예: 5시 이후) **감시 폴더**에 그날 xlsx가 떨어지면, PC 스케줄러가 자동으로 반영한다.
+순수 파이썬만 돌기 때문에 Claude/AI 사용량 한도와 **무관**하다.
+
+핵심 명령 — 감시 폴더의 새 엑셀만 골라 반영:
+```bash
+python build.py sync --from "<감시폴더>" --pattern "*.xlsx"
+```
+- 이미 반영된 조사일(같은 날짜)은 자동으로 건너뛴다.
+- 파일명에 `YYYYMMDD` 또는 `YYYY-MM-DD` 가 있으면 그 날짜, 없으면 엑셀 `요약` 시트의 생성일로 조사일을 잡는다.
+- 인식 안 되는 xlsx(다른 파일)는 건너뛰고 로그만 남긴다.
+
+**macOS / Linux** — `auto_update.sh` 상단 3줄(WATCH_DIR/PATTERN/GIT_PUSH) 수정 후:
+```bash
+chmod +x auto_update.sh
+crontab -e
+# 매일 17:10 실행 (경로는 본인 것으로)
+10 17 * * * /경로/shoe-arbitrage/auto_update.sh >> /경로/shoe-arbitrage/auto_update.log 2>&1
+```
+
+**Windows** — `auto_update.bat` 상단 WATCH_DIR/PATTERN 수정 후, **작업 스케줄러 → 기본 작업 만들기 → 매일 17:10 → 프로그램 시작**에 이 `.bat`을 지정(시작 위치=이 폴더).
+
+> `GIT_PUSH="yes"` 로 두면 갱신 후 git 커밋·푸시까지 해서 다른 기기·온라인 링크에도 반영된다(자격증명 설정 필요).
+> 자동 업데이트 후에는 항상 `shoe-arbitrage/board.html` 을 열면 최신 상태.
+
 `sync`는 `data/raw/`의 엑셀 중 **아직 스냅샷 없는 조사일만** 골라 반영한다(중복 스킵).
 개별 처리도 가능:
 
