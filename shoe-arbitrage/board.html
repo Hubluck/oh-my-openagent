@@ -185,11 +185,16 @@
   .countline{font-size:12px; color:var(--muted); margin:2px 2px 10px; display:flex; justify-content:space-between}
 
   .row-code{display:flex; align-items:center; gap:8px; margin-bottom:9px}
-  .codeval{font-size:14px; font-weight:800; color:var(--accent); letter-spacing:.01em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-  .codeval.none{color:var(--muted); font-weight:600}
-  .copybtn{margin-left:auto; flex:none; border:1px solid var(--hair); background:var(--surface-2); color:var(--ink-2);
-    border-radius:8px; padding:4px 11px; font-size:11.5px; font-weight:700; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; gap:4px}
-  .copybtn:active{transform:scale(.95)} .copybtn.done{background:var(--profit); color:#fff; border-color:var(--profit)}
+  .codeval{font-size:14px; font-weight:800; color:var(--accent); letter-spacing:.01em; overflow:hidden; text-overflow:ellipsis;
+    white-space:nowrap; background:none; border:0; padding:0; font-family:inherit; cursor:pointer;
+    text-decoration:underline; text-decoration-style:dotted; text-underline-offset:3px; text-decoration-color:var(--hair)}
+  .codeval.none{color:var(--muted); font-weight:600; cursor:default; text-decoration:none}
+  .actbtns{margin-left:auto; flex:none; display:flex; gap:5px}
+  .act{border:1px solid var(--hair); background:var(--surface-2); color:var(--ink-2); border-radius:8px;
+    width:32px; height:28px; display:grid; place-items:center; font-size:13.5px; cursor:pointer; font-family:inherit; padding:0}
+  .act:active{transform:scale(.92)}
+  .act.on{background:var(--accent); color:#fff; border-color:var(--accent)}
+  .act.done{background:var(--profit); color:#fff; border-color:var(--profit)}
   .netnote{font-size:10.5px; color:var(--muted); font-weight:600; margin-top:2px}
   .netnote s{opacity:.8}
 
@@ -197,6 +202,27 @@
     background:var(--ink); color:var(--plane); font-size:13px; font-weight:700; padding:11px 18px; border-radius:999px;
     box-shadow:0 8px 30px rgba(0,0,0,.35); opacity:0; pointer-events:none; transition:opacity .18s,transform .18s; max-width:82vw; text-align:center}
   .toast.on{opacity:1; transform:translateX(-50%) translateY(0)}
+
+  /* 품번 비교 모달 */
+  .cmpmodal{position:fixed; inset:0; z-index:70; background:rgba(20,21,15,.55); display:flex; align-items:flex-end; justify-content:center}
+  .cmpmodal[hidden]{display:none}
+  .cmpcard{background:var(--surface); width:100%; max-width:520px; border-radius:18px 18px 0 0; padding:16px 16px 24px;
+    max-height:82vh; overflow-y:auto; box-shadow:0 -8px 40px rgba(0,0,0,.35)}
+  @media(min-width:560px){ .cmpmodal{align-items:center} .cmpcard{border-radius:18px} }
+  .cmphead{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:6px}
+  .cmpcode{font-size:15px; font-weight:800; color:var(--accent)}
+  .cmpname{font-size:12.5px; color:var(--ink-2); margin-top:2px; line-height:1.4}
+  .cmpx{border:0; background:none; font-size:24px; color:var(--muted); cursor:pointer; line-height:.8; flex:none}
+  .cmpmkt{font-size:11.5px; color:var(--muted); font-weight:600; margin-bottom:12px}
+  .cmplist{display:flex; flex-direction:column; gap:8px}
+  .cmprow{display:flex; align-items:center; gap:10px; padding:11px 13px; border:1px solid var(--hair); border-radius:12px; background:var(--surface-2)}
+  .cmprow.best{border-color:var(--profit); background:var(--profit-soft)}
+  .cmp-site{font-size:13px; font-weight:700; flex:1; display:flex; align-items:center}
+  .cmp-best{font-size:10px; font-weight:800; color:var(--profit); border:1px solid var(--profit); border-radius:6px; padding:1px 6px; margin-left:7px}
+  .cmp-r{text-align:right}
+  .cmp-src{font-size:14px; font-weight:800; font-variant-numeric:tabular-nums}
+  .cmp-net{font-size:11.5px; font-weight:700; color:var(--profit); font-variant-numeric:tabular-nums} .cmp-net.neg{color:var(--loss)}
+  .cmpsingle{font-size:12.5px; color:var(--muted); padding:8px 2px}
 
   .list{display:flex; flex-direction:column; gap:10px}
   .row{background:var(--surface); border:1px solid var(--hair); border-radius:15px; padding:13px 14px; box-shadow:var(--shadow);
@@ -329,7 +355,7 @@
 
   <div class="sec-h">
     <h2>기회 지도</h2>
-    <span class="hint">오른쪽 위 = 꿀</span>
+    <span class="hint">★ 초록 = 추천 상위</span>
   </div>
   <div class="card mapwrap">
     <div class="mapcanvas-box"><canvas id="map"></canvas></div>
@@ -395,6 +421,14 @@
 </div>
 
 <div class="toast" id="toast"></div>
+<div class="cmpmodal" id="cmpmodal" hidden><div class="cmpcard">
+  <div class="cmphead">
+    <div><div class="cmpcode num" id="cmpcode"></div><div class="cmpname" id="cmpname"></div></div>
+    <button class="cmpx" id="cmpx" type="button" aria-label="닫기">×</button>
+  </div>
+  <div class="cmpmkt" id="cmpmkt"></div>
+  <div class="cmplist" id="cmplist"></div>
+</div></div>
 <div class="dropveil" id="dropveil"><div class="inner">
   <div class="big">📥</div><div class="t">엑셀을 여기에 놓으세요</div>
   <div class="s">포이즌 × 리테일 통합표(.xlsx) · 이 기기에 스냅샷으로 저장됩니다</div>
@@ -666,15 +700,17 @@ window.ShoeXlsx = (function(){
     const code=x[9]||'';
     return `<div class="row ${neg?'neg':''}" data-key="${escapeHtml(key)}">
       <div class="row-code">
-        <span class="codeval ${code?'':'none'} num">${code?escapeHtml(code):'품번 없음'}</span>
-        <button class="cart" data-act="cart" type="button">🛒 구매</button>
-        ${code?`<button class="copybtn" data-act="copy" data-code="${escapeHtml(code)}" type="button">⧉ 복사</button>`:''}
+        <button class="codeval ${code?'':'none'} num" data-act="cmp" data-code="${escapeHtml(code)}" ${code?'':'disabled'} type="button" title="이 품번 매장별 비교">${code?escapeHtml(code):'품번 없음'}</button>
+        <div class="actbtns">
+          <button class="act" data-act="cart" type="button" title="재고에 구매 기록">🛒</button>
+          <button class="act ${on?'on':''}" data-act="pin" type="button" title="요청 담기">📌</button>
+          ${code?`<button class="act" data-act="copy" data-code="${escapeHtml(code)}" type="button" title="품번 복사">⧉</button>`:''}
+        </div>
       </div>
       <div class="row-top">
         <span class="brand">${escapeHtml(B[x[1]])}</span>
         <span class="site">${escapeHtml(S[x[2]])}</span>
         <span class="rank">#${rank}</span>
-        <button class="pin ${on?'on':''}" data-act="pin" type="button">${on?'📌 담김':'📌 요청'}</button>
       </div>
       <p class="pname">${escapeHtml(x[0])}</p>
       <div class="row-memo" ${on?'':'hidden'}><input data-act="memo" placeholder="메모: 이 상품에 뭘 요청할까요? (예: 수수료 반영 실수령 계산)" value="${escapeHtml(note)}"></div>
@@ -733,23 +769,41 @@ window.ShoeXlsx = (function(){
     const plotW=W-PAD.l-PAD.r, plotH=H-PAD.t-PAD.b;
     const X=v=>PAD.l+plotW*(Math.log10(v+1)/logMax);
     const Y=v=>PAD.t+plotH*(1-Math.min(v,maxM)/maxM);
-    const zx=X(maxVol*0.02), zy=Y(maxM*0.55);
-    ctx.fillStyle=cssvar('--profit-soft'); ctx.fillRect(zx,PAD.t,(W-PAD.r)-zx,zy-PAD.t);
+    // 가로 격자 + 마진 눈금
     ctx.strokeStyle=hair; ctx.lineWidth=1; ctx.fillStyle=muted;
     ctx.font='10px ui-monospace,Menlo,monospace'; ctx.textAlign='right'; ctx.textBaseline='middle';
     for(let i=0;i<=3;i++){const val=maxM*i/3, yy=Y(val);
       ctx.beginPath(); ctx.moveTo(PAD.l,yy); ctx.lineTo(W-PAD.r,yy); ctx.stroke();
       ctx.fillText(val>=10000?Math.round(val/10000)+'만':'0', PAD.l-6, yy);}
+    // 추천 상위(마진×수요) 집합 — 이게 실제 "꿀"
+    const topN = plotData.slice().sort((a,b)=>score(b)-score(a)).slice(0,6);
+    const topSet = new Set(topN);
     pts=[];
+    // 일반 점 먼저
     for(const x of plotData){
+      if(topSet.has(x)) continue;
       const px=X(x[6]), py=Y(effMargin(x));
-      const big = effMargin(x)>maxM*0.4 && x[6]>maxVol*0.01;
-      ctx.beginPath(); ctx.arc(px,py,x[6]===0?2.4:3.2,0,7);
-      ctx.fillStyle=big?profit:accent; ctx.globalAlpha=x[6]===0?0.32:0.72; ctx.fill();
+      ctx.beginPath(); ctx.arc(px,py,x[6]===0?2.2:3,0,7);
+      ctx.fillStyle=accent; ctx.globalAlpha=x[6]===0?0.28:0.6; ctx.fill();
       pts.push([px,py,x]);
     }
-    ctx.globalAlpha=1; ctx.fillStyle=profit; ctx.font='700 10px system-ui';
-    ctx.textAlign='right'; ctx.textBaseline='top'; ctx.fillText('꿀 존', W-PAD.r-4, PAD.t+4);
+    // 추천 상위 강조 (초록 + 흰 링)
+    ctx.globalAlpha=1;
+    for(const x of topN){
+      const px=X(x[6]), py=Y(effMargin(x));
+      ctx.beginPath(); ctx.arc(px,py,5,0,7); ctx.fillStyle=profit; ctx.fill();
+      ctx.lineWidth=1.5; ctx.strokeStyle=cssvar('--surface'); ctx.stroke();
+      pts.push([px,py,x]);
+    }
+    // 1위 직접 라벨
+    if(topN.length){
+      const x=topN[0], px=X(x[6]), py=Y(effMargin(x));
+      const nm=(x[0]||'').slice(0,10)+((x[0]||'').length>10?'…':'');
+      ctx.fillStyle=profit; ctx.font='700 10px system-ui'; ctx.textBaseline='bottom';
+      const rightHalf = px > W*0.6;
+      ctx.textAlign = rightHalf?'right':'left';
+      ctx.fillText('★ '+nm, px + (rightHalf?-8:8), py-6);
+    }
   }
   cv.addEventListener('pointerdown',e=>{
     const rect=cv.getBoundingClientRect(), mx=e.clientX-rect.left, my=e.clientY-rect.top;
@@ -881,7 +935,36 @@ window.ShoeXlsx = (function(){
     persistReq(); paint(); renderReq();
   }
 
+  // 품번 매장별 비교
+  function openCmp(code){
+    if(!code) return;
+    const group=R.filter(x=>x[9]===code);
+    if(!group.length) return;
+    group.sort((a,b)=>a[3]-b[3]);
+    const first=group[0], minSrc=first[3];
+    $('cmpcode').textContent=code;
+    $('cmpname').textContent=first[0];
+    $('cmpmkt').textContent=`포이즌 시장가 ${won(first[5])} · 매칭 매장 ${group.length}곳`;
+    $('cmplist').innerHTML=group.map(x=>{
+      const net=effMargin(x), best=x[3]===minSrc;
+      return `<div class="cmprow ${best?'best':''}">
+        <span class="cmp-site">${escapeHtml(S[x[2]])}${best?'<span class="cmp-best">최저</span>':''}</span>
+        <div class="cmp-r">
+          <div class="cmp-src num">${wonPlain(x[3])}</div>
+          <div class="cmp-net num ${net<0?'neg':''}">${feesActive()?'실수령 ':'마진 '}${signed(net)}</div>
+        </div>
+      </div>`;
+    }).join('') + (group.length===1?'<div class="cmpsingle">이 품번은 이 매장에서만 매칭됐어요.</div>':'');
+    $('cmpmodal').hidden=false;
+  }
+  function closeCmp(){ $('cmpmodal').hidden=true; }
+  $('cmpx').addEventListener('click',closeCmp);
+  $('cmpmodal').addEventListener('click',e=>{ if(e.target===$('cmpmodal')) closeCmp(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeCmp(); });
+
   listEl.addEventListener('click',e=>{
+    const cm=e.target.closest('[data-act="cmp"]');
+    if(cm){ if(cm.dataset.code) openCmp(cm.dataset.code); return; }
     const cp=e.target.closest('[data-act="copy"]');
     if(cp){ copyText(cp.dataset.code); const orig=cp.textContent; cp.classList.add('done'); cp.textContent='✓ 복사됨';
       setTimeout(()=>{cp.classList.remove('done'); cp.textContent=orig;},1200); return; }
