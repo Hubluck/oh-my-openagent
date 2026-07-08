@@ -1,6 +1,9 @@
 # CLAUDE.md — Vault Root 운영 지도
 
-이 볼트(Obsidian) 루트에는 **서로 독립적으로 운영되는 여러 영역**이 섞여 있다.
+이 루트에는 **서로 독립적으로 운영되는 여러 영역**이 섞여 있다. 크게 둘로 나뉜다:
+- **코드 제품**: 루트 자체가 `oh-my-opencode`(Bun/TypeScript AI 에이전트 하네스, `package.json`·`src/`·`packages/`·`bin/`·`tests/`)다. 저장소 용량·활동의 대부분이 여기다. **위키 규칙이 아니라 코드 규칙(`AGENTS.md`)을 따른다.**
+- **볼트 영역**: `_company/`·`Hello/`·`AI-Agent-Wiki/`·`knowledge/` 같은 Obsidian 성격의 지식/운영 폴더들.
+
 이 파일의 목적은 단 하나: **"무엇이 어느 폴더에 있고, 새 작업물은 어디에 두며, 어디는 건드리면 안 되는지"** 를 한눈에 정하는 것.
 
 각 영역은 자체 규칙 파일을 가진다. **그 영역에서 일할 때는 먼저 해당 규칙 파일을 읽고 그 규칙을 따른다.** 이 루트 파일은 그 규칙들보다 위가 아니라, 영역으로 가는 **라우팅 안내**일 뿐이다.
@@ -20,6 +23,7 @@
 
 | 폴더 | 무엇인가 | 규칙 파일 (먼저 읽기) | 새 작업물 위치 / 주의 |
 |---|---|---|---|
+| **루트 (`src/`·`packages/`·`bin/`·`tests/`)** | `oh-my-opencode` — Bun/TS AI 에이전트 하네스(멀티모델·백그라운드 에이전트·LSP/AST 툴). **이 저장소의 본체 코드 프로젝트.** | `AGENTS.md`(루트), `src/AGENTS.md`, `packages/AGENTS.md` | 코드는 여기서 작업. `bun install`/`bun run build`/`bun test`. **위키 규칙 적용 안 함.** `.omo/rules/`도 참고 |
 | `_company/` | 1인 기업 OS. AI 에이전트(ceo·developer·designer·writer 등)의 공유 메모리·세션·승인 워크플로 | `_company/_shared/_system.md` | 산출물은 `sessions/<ts>/`. 공유 기억은 `_shared/`. `00_Raw/`는 읽기 전용. `_agents/*/config.md`는 시크릿(절대 커밋/노출 금지) |
 | `Hello/` | Karpathy 패턴 LLM 위키 (이 폴더 자체가 위키 루트) | `Hello/AGENTS.md` | 원본은 `Hello/raw/`(불변), 가공된 위키 문서는 `Hello/docs/`(sources·concepts·entities·analyses). 운영은 `/wiki-ingest`·`/wiki-query`·`/wiki-lint` 스킬 |
 | `AI-Agent-Wiki/` | 또 다른 LLM 위키 (자체 CLAUDE.md 보유, AI 에이전트 주제) | `AI-Agent-Wiki/CLAUDE.md` | 원본 `AI-Sessions/raw/`(불변), 가공 `AI-Sessions/wiki/`. `save`/`reference`/`ingest`/`query`/`lint` 명령 규약 |
@@ -37,6 +41,7 @@
 
 새 내용을 어디에 둘지 헷갈릴 때 순서대로 판단한다:
 
+0. **`oh-my-opencode` 하네스 코드(기능·버그·테스트·패키지)** → 루트(`src/`·`packages/`), 규칙은 `AGENTS.md`
 1. **에이전트 회사 업무(브랜딩·기획·세션 산출물)** → `_company/`
 2. **AI 에이전트 주제의 정제 지식** → `AI-Agent-Wiki/`
 3. **일반 주제의 위키성 지식** → `Hello/`
