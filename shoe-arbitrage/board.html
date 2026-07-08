@@ -146,8 +146,9 @@
   .readout.empty{color:var(--muted)}
   .readout b{color:var(--ink)}
 
-  .controls{display:flex; flex-direction:column; gap:10px; position:sticky; top:0; z-index:5;
-    background:var(--plane); padding:8px 14px 9px; margin:0 -14px}
+  .controls{display:flex; flex-direction:column; gap:11px}
+  .stickytop{position:sticky; top:0; z-index:6; background:var(--plane); margin:0 -14px; padding:8px 14px 10px;
+    display:flex; flex-direction:column; gap:10px}
   .searchrow{display:flex; gap:8px}
   .search{flex:1; display:flex; align-items:center; gap:7px; background:var(--surface); border:1px solid var(--hair);
     border-radius:12px; padding:9px 12px}
@@ -169,13 +170,17 @@
   .toggle .sw::after{content:""; position:absolute; top:2px; left:2px; width:17px; height:17px; border-radius:50%; background:#fff; transition:.15s; box-shadow:0 1px 2px rgba(0,0,0,.3)}
   .toggle.on .sw{background:var(--profit)}
   .toggle.on .sw::after{left:17px}
-  .toolrow{display:flex; gap:14px; flex-wrap:wrap}
+  .toolrow{display:flex; gap:14px; flex-wrap:wrap; align-items:center}
   .feerow{display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:12px; color:var(--ink-2)}
-  .feerow .fl{font-size:11px; font-weight:800; color:var(--muted); letter-spacing:.02em}
-  .feerow label{display:inline-flex; align-items:center; gap:4px; font-weight:600}
-  .feerow input{width:62px; border:1px solid var(--hair); background:var(--surface); color:var(--ink);
+  .feecfg{border:1px solid var(--hair); background:var(--surface); color:var(--muted); font-family:inherit;
+    font-size:11.5px; font-weight:700; border-radius:8px; padding:5px 10px; cursor:pointer}
+  .feecfg.on{color:var(--accent); border-color:var(--accent)}
+  .feefields{display:flex; align-items:center; gap:10px; flex-wrap:wrap; width:100%; padding-top:2px}
+  .feefields[hidden]{display:none}
+  .feefields label{display:inline-flex; align-items:center; gap:4px; font-weight:600}
+  .feefields input{width:62px; border:1px solid var(--hair); background:var(--surface); color:var(--ink);
     border-radius:8px; padding:5px 7px; font-size:12.5px; font-family:inherit; text-align:right; font-variant-numeric:tabular-nums}
-  .feerow input:focus{outline:2px solid var(--accent); outline-offset:1px}
+  .feefields input:focus{outline:2px solid var(--accent); outline-offset:1px}
 
   .countline{font-size:12px; color:var(--muted); margin:2px 2px 10px; display:flex; justify-content:space-between}
 
@@ -337,29 +342,34 @@
   </div>
 
   <div class="controls">
-    <div class="searchrow">
-      <label class="search">
-        <span class="ic">⌕</span>
-        <input id="q" type="search" placeholder="상품·브랜드 검색" autocomplete="off">
-      </label>
-      <select class="sortsel" id="sort">
-        <option value="score">추천순 (마진×수요)</option>
-        <option value="margin">마진 큰 순</option>
-        <option value="mpct">마진율 높은 순</option>
-        <option value="vol">수요 많은 순</option>
-      </select>
+    <div class="stickytop">
+      <div class="searchrow">
+        <label class="search">
+          <span class="ic">⌕</span>
+          <input id="q" type="search" placeholder="상품·브랜드·품번 검색" autocomplete="off">
+        </label>
+        <select class="sortsel" id="sort">
+          <option value="score">추천순 (마진×수요)</option>
+          <option value="margin">마진 큰 순</option>
+          <option value="mpct">마진율 높은 순</option>
+          <option value="vol">수요 많은 순</option>
+        </select>
+      </div>
+      <div class="chiprow" id="chips"></div>
     </div>
-    <div class="chiprow" id="chips"></div>
     <div class="toolrow">
       <label class="toggle on" id="posonly"><span class="sw"></span><span>마진 남는 것만</span></label>
       <label class="toggle" id="dedupe"><span class="sw"></span><span>품번당 최저가만</span></label>
     </div>
     <div class="feerow">
       <label class="toggle on" id="feeon"><span class="sw"></span><span>포이즌 수수료 반영</span></label>
-      <label>요율 <input id="feeRate" type="number" min="0" step="0.5" inputmode="decimal">%</label>
-      <label>최소 <input id="feeFloor" type="number" min="0" step="1000" inputmode="numeric"></label>
-      <label>최대 <input id="feeCap" type="number" min="0" step="1000" inputmode="numeric"></label>
-      <label>추가 <input id="feeExtra" type="number" min="0" step="500" inputmode="numeric">원</label>
+      <button class="feecfg" id="feecfg" type="button">⚙ 요율 설정</button>
+      <div class="feefields" id="feefields" hidden>
+        <label>요율 <input id="feeRate" type="number" min="0" step="0.5" inputmode="decimal">%</label>
+        <label>최소 <input id="feeFloor" type="number" min="0" step="1000" inputmode="numeric"></label>
+        <label>최대 <input id="feeCap" type="number" min="0" step="1000" inputmode="numeric"></label>
+        <label>추가 <input id="feeExtra" type="number" min="0" step="500" inputmode="numeric">원</label>
+      </div>
     </div>
   </div>
 
@@ -766,6 +776,7 @@ window.ShoeXlsx = (function(){
   function feeInput(){ feeRate=Math.max(0,+fRate.value||0); feeFloor=Math.max(0,+fFloor.value||0);
     feeCap=Math.max(0,+fCap.value||0); feeExtra=Math.max(0,+fExtra.value||0); saveFees(); renderKpis(); apply(); }
   [fRate,fFloor,fCap,fExtra].forEach(el=>el.addEventListener('input',feeInput));
+  $('feecfg').addEventListener('click',()=>{ const f=$('feefields'); f.hidden=!f.hidden; $('feecfg').classList.toggle('on',!f.hidden); });
   let qt; $('q').addEventListener('input',e=>{clearTimeout(qt); qt=setTimeout(()=>{query=e.target.value.trim().toLowerCase(); apply();},140);});
 
   const snapEl=$('snapsel');
@@ -828,7 +839,7 @@ window.ShoeXlsx = (function(){
   });
   matchMedia('(prefers-color-scheme:dark)').addEventListener('change',drawMap);
 
-  $('foot').innerHTML='소싱가=국내 리테일 최저가 · 시장가=포이즌 거래 기준가 · 마진=시장가−소싱가(수수료·배송 제외)<br>수요=포이즌 누적 거래량 · 조사일별 스냅샷을 위에서 선택';
+  $('foot').innerHTML='소싱가=국내 리테일 최저가 · 시장가=포이즌 거래 기준가 · 수요=포이즌 누적 거래량<br>실수령=시장가−포이즌수수료−소싱가 (수수료 반영 ON 기준, 토글로 총마진 전환 가능)';
 
   // ---------- 요청함 (상품별 📌 + 자유 메모) ----------
   const REQ_KEY='shoeArb.requests.v1';
