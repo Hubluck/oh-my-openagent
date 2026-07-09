@@ -987,25 +987,30 @@ window.ShoeXlsx = (function(){
   const escapeAttr=s=>(s||'').replace(/"/g,'%22');
   // 한국 mm → EU 근사 환산 (일반 남성 기준, 브랜드별 상이). 파리포인트식.
   function euFromMm(mm){ const m=parseInt(mm,10); if(!m||m<180||m>360) return ''; return Math.round((m+16)/6.6667*2)/2; }
-  // 품번 클릭 시 항상 뜨는 사이즈 환산표 — 구매 가능 사이즈는 파란색으로 매칭 표시
+  // 한국 mm → US(남성) 근사 환산.  US ≈ mm/10 - 18  (예: 270mm→US9, 250mm→US7)
+  function usFromMm(mm){ const m=parseInt(mm,10); if(!m||m<180||m>360) return ''; return Math.round((m/10-18)*2)/2; }
+  function sizeGrid(STD, avail, hasNums, mode){
+    return `<div class="sizegrid ${hasNums?'hasdata':''}">`+STD.map(mm=>{
+      const on=avail.has(''+mm);
+      const main = mode==='sell' ? ('US '+usFromMm(mm)) : (''+mm);
+      return `<span class="sizechip ${on?'avail':''}"><b>${main}</b><i>EU ${euFromMm(mm)}</i></span>`;
+    }).join('')+'</div>';
+  }
+  // 품번 클릭 시 항상 뜨는 사이즈 환산표 2세트 — 구매(한국 mm) vs 판매(포이즌 US), 재고는 파란색 매칭
   function sizeTable(stockStr, siteName){
     const raw=(stockStr||'').trim();
     const avail=new Set(raw.split(',').map(s=>s.trim()).filter(s=>/^\d+$/.test(s)));
     const hasNums=avail.size>0;
-    const nonNumeric = raw && !hasNums;               // 예: '판매중'
     const STD=[]; for(let mm=220; mm<=300; mm+=5) STD.push(mm);
-    // 재고에 표에 없는 사이즈가 있으면 추가
     avail.forEach(v=>{ const n=+v; if(n && !STD.includes(n)) STD.push(n); });
     STD.sort((a,b)=>a-b);
-    let note = hasNums ? `${escapeHtml(siteName)} 재고 ${avail.size}개 · <b style="color:var(--accent)">파란색=구매가능</b>`
-             : nonNumeric ? `재고표기 "${escapeHtml(raw)}" · 아래는 mm↔EU 참고표`
-             : '이 상품은 사이즈 정보 없음 · 아래는 mm↔EU 참고표';
-    const grid=`<div class="sizegrid ${hasNums?'hasdata':''}">`+STD.map(mm=>{
-      const on=avail.has(''+mm);
-      return `<span class="sizechip ${on?'avail':''}"><b>${mm}</b><i>EU ${euFromMm(mm)}</i></span>`;
-    }).join('')+'</div>';
-    return `<div class="dt-sec">사이즈 환산표 <span class="dt-note">${note}</span></div>${grid}`
-         + `<div class="sizehint">숫자=한국 mm · EU는 일반 남성 기준 근사값(브랜드별 다를 수 있음)</div>`;
+    const availNote = hasNums ? `<b style="color:var(--accent)">파란색=취급 사이즈</b>`
+                    : (raw ? `재고표기 "${escapeHtml(raw)}"` : '재고 사이즈 정보 없음');
+    return `<div class="dt-sec">🛒 구매 기준 · 한국 매장(mm) <span class="dt-note">${escapeHtml(siteName)} · ${availNote}</span></div>`
+         + sizeGrid(STD, avail, hasNums, 'buy')
+         + `<div class="dt-sec">📈 판매 기준 · 포이즌(US) <span class="dt-note">같은 사이즈를 US로 · 포이즌 등록용</span></div>`
+         + sizeGrid(STD, avail, hasNums, 'sell')
+         + `<div class="sizehint">한국 mm ↔ EU ↔ US 근사 환산 · 일반 남성 기준(브랜드별 다를 수 있음)</div>`;
   }
   function openDetail(x){
     if(!x) return;
