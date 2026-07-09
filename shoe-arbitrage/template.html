@@ -232,10 +232,13 @@
   .dt-buy:active{transform:scale(.98)}
   .dt-sec{font-size:11.5px; font-weight:800; color:var(--muted); letter-spacing:.03em; margin:16px 0 9px; display:flex; align-items:center; gap:7px}
   .dt-note{font-weight:600; color:var(--muted); opacity:.85}
-  .sizegrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(56px,1fr)); gap:7px}
-  .sizechip{border:1px solid var(--hair); border-radius:9px; padding:10px 4px; text-align:center; font-size:13px;
-    font-weight:700; font-variant-numeric:tabular-nums; background:var(--surface-2); color:var(--ink)}
-  .sizechip.wide{grid-column:1/-1; font-weight:800; color:var(--profit)}
+  .sizegrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(62px,1fr)); gap:7px}
+  .sizechip{border:1px solid var(--hair); border-radius:9px; padding:8px 4px; text-align:center; background:var(--surface-2);
+    color:var(--ink); display:flex; flex-direction:column; align-items:center; gap:1px}
+  .sizechip b{font-size:15px; font-weight:800; font-variant-numeric:tabular-nums}
+  .sizechip i{font-size:10px; font-weight:700; color:var(--muted); font-style:normal}
+  .sizechip.wide{grid-column:1/-1; font-weight:800; color:var(--profit); padding:11px; font-size:14px}
+  .sizehint{font-size:10.5px; color:var(--muted); margin-top:9px; line-height:1.5}
 
   .list{display:flex; flex-direction:column; gap:12px}
   .row{background:var(--surface); border:1px solid var(--hair); border-radius:16px; padding:16px 17px; box-shadow:var(--shadow);
@@ -308,6 +311,7 @@
   .invfields{display:grid; grid-template-columns:repeat(2,1fr); gap:8px}
   .invf{display:flex; flex-direction:column; gap:3px}
   .invf label{font-size:10px; font-weight:700; color:var(--muted); letter-spacing:.02em}
+  .invf .euh{color:var(--accent); font-weight:800}
   .invf input{border:1px solid var(--hair); background:var(--surface-2); color:var(--ink); border-radius:8px;
     padding:7px 9px; font-size:13px; font-family:inherit; font-variant-numeric:tabular-nums; width:100%}
   .invf input:focus{outline:2px solid var(--accent); outline-offset:1px}
@@ -978,11 +982,15 @@ window.ShoeXlsx = (function(){
 
   // 상품 상세 — 사이즈 + 구매 링크 + 매장별 비교 (포이즌 앱 느낌)
   const escapeAttr=s=>(s||'').replace(/"/g,'%22');
+  // 한국 mm → EU 근사 환산 (일반 남성 기준, 브랜드별 상이). 파리포인트식.
+  function euFromMm(mm){ const m=parseInt(mm,10); if(!m||m<180||m>360) return ''; return Math.round((m+16)/6.6667*2)/2; }
   function sizeBlock(sizes){
     sizes=(sizes||'').trim();
     if(!sizes) return '<div class="cmpsingle">사이즈 정보 없음 (소싱 링크에서 확인)</div>';
     if(/[,]/.test(sizes) && /\d/.test(sizes)){
-      return '<div class="sizegrid">'+sizes.split(',').map(s=>`<span class="sizechip">${escapeHtml(s.trim())}</span>`).join('')+'</div>';
+      const chips=sizes.split(',').map(s=>{ s=s.trim(); const eu=euFromMm(s);
+        return `<span class="sizechip"><b>${escapeHtml(s)}</b>${eu?`<i>EU ${eu}</i>`:''}</span>`; }).join('');
+      return `<div class="sizegrid">${chips}</div><div class="sizehint">숫자=한국 mm · EU는 일반 남성 기준 근사값(브랜드별 다를 수 있음)</div>`;
     }
     return `<div class="sizegrid"><span class="sizechip wide">${escapeHtml(sizes)}</span></div>`;
   }
@@ -1081,7 +1089,7 @@ window.ShoeXlsx = (function(){
 
   function addToInv(x){
     inv.push({id:Date.now()+'-'+Math.random().toString(36).slice(2,6), code:x[9]||'', name:x[0], brand:B[x[1]], site:S[x[2]],
-      buyPrice:x[3], qty:1, ship:3000, buyDate:today(), marketPrice:x[5], status:'holding', sellPrice:'', sellDate:''});
+      buyPrice:x[3], qty:1, ship:3000, buyDate:today(), marketPrice:x[5], status:'holding', sellPrice:'', sellDate:'', size:''});
     persistInv(); updateInvBadge(); toast('재고에 담김 · 📦 내 재고 탭에서 확인');
   }
   function updateInvBadge(){ const el=$('invtabcount'); el.textContent=inv.length; el.classList.toggle('zero',inv.length===0); }
@@ -1110,6 +1118,7 @@ window.ShoeXlsx = (function(){
         <button class="invrow-x" data-act="invdel" type="button" aria-label="삭제">×</button>
       </div>
       <div class="invfields">
+        <div class="invf"><label>사이즈(mm) <span class="euh">${it.size&&euFromMm(it.size)?'· EU '+euFromMm(it.size):''}</span></label><input data-f="size" inputmode="numeric" placeholder="예: 270" value="${escapeHtml(it.size||'')}"></div>
         <div class="invf"><label>구매가</label><input data-f="buyPrice" type="number" inputmode="numeric" value="${it.buyPrice||0}"></div>
         <div class="invf"><label>수량</label><input data-f="qty" type="number" min="1" inputmode="numeric" value="${it.qty||1}"></div>
         <div class="invf"><label>택배비</label><input data-f="ship" type="number" inputmode="numeric" value="${it.ship||0}"></div>
@@ -1136,8 +1145,9 @@ window.ShoeXlsx = (function(){
     const inp=e.target.closest('[data-f]'); if(!inp) return;
     const it=findInv(inp.closest('.invrow').getAttribute('data-id')); if(!it) return;
     const f=inp.dataset.f;
-    it[f] = (f==='buyDate'||f==='sellDate') ? inp.value : (+inp.value||0);
+    it[f] = (f==='buyDate'||f==='sellDate'||f==='size') ? inp.value : (+inp.value||0);
     persistInvSoon();
+    if(f==='size'){ const euh=inp.closest('.invf').querySelector('.euh'); if(euh){ const eu=euFromMm(it.size); euh.textContent = eu?('· EU '+eu):''; } }
     const row=inp.closest('.invrow'); const pl=invPL(it);
     const plv=row.querySelector('.plv'); plv.textContent=signed(pl); plv.classList.toggle('neg',pl<0);
     renderInvSummary();
@@ -1161,9 +1171,9 @@ window.ShoeXlsx = (function(){
   function csvCell(v){ v=(v==null?'':''+v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
   $('invExportCsv').addEventListener('click',()=>{
     if(!inv.length){ toast('재고가 비어 있어요'); return; }
-    const head=['품번','상품명','브랜드','매장','구매가','수량','택배비','구매일','상태','판매가','판매일','기준시장가','단위손익','총손익'];
+    const head=['품번','상품명','브랜드','매장','사이즈(mm)','EU','구매가','수량','택배비','구매일','상태','판매가','판매일','기준시장가','단위손익','총손익'];
     const rows=inv.map(it=>{ const sold=it.status==='sold'; const unit=invUnitNet(it, sold?it.sellPrice:it.marketPrice);
-      return [it.code,it.name,it.brand,it.site,it.buyPrice,it.qty,it.ship,it.buyDate, sold?'판매완료':'보유중',
+      return [it.code,it.name,it.brand,it.site,it.size||'',euFromMm(it.size)||'',it.buyPrice,it.qty,it.ship,it.buyDate, sold?'판매완료':'보유중',
         sold?it.sellPrice:'', it.sellDate||'', it.marketPrice, unit, unit*(+it.qty||1)]; });
     const csv=[head,...rows].map(r=>r.map(csvCell).join(',')).join('\r\n');
     downloadFile('﻿'+csv, `inventory-${today()}.csv`, 'text/csv;charset=utf-8');
