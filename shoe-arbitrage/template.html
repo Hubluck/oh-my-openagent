@@ -238,6 +238,9 @@
   .sizechip b{font-size:15px; font-weight:800; font-variant-numeric:tabular-nums}
   .sizechip i{font-size:10px; font-weight:700; color:var(--muted); font-style:normal}
   .sizechip.wide{grid-column:1/-1; font-weight:800; color:var(--profit); padding:11px; font-size:14px}
+  .sizechip.avail{border-color:var(--accent); background:var(--accent-soft)}
+  .sizechip.avail b{color:var(--accent)}
+  .sizegrid.hasdata .sizechip:not(.avail){opacity:.4}
   .sizehint{font-size:10.5px; color:var(--muted); margin-top:9px; line-height:1.5}
 
   .list{display:flex; flex-direction:column; gap:12px}
@@ -984,15 +987,25 @@ window.ShoeXlsx = (function(){
   const escapeAttr=s=>(s||'').replace(/"/g,'%22');
   // 한국 mm → EU 근사 환산 (일반 남성 기준, 브랜드별 상이). 파리포인트식.
   function euFromMm(mm){ const m=parseInt(mm,10); if(!m||m<180||m>360) return ''; return Math.round((m+16)/6.6667*2)/2; }
-  function sizeBlock(sizes){
-    sizes=(sizes||'').trim();
-    if(!sizes) return '<div class="cmpsingle">사이즈 정보 없음 (소싱 링크에서 확인)</div>';
-    if(/[,]/.test(sizes) && /\d/.test(sizes)){
-      const chips=sizes.split(',').map(s=>{ s=s.trim(); const eu=euFromMm(s);
-        return `<span class="sizechip"><b>${escapeHtml(s)}</b>${eu?`<i>EU ${eu}</i>`:''}</span>`; }).join('');
-      return `<div class="sizegrid">${chips}</div><div class="sizehint">숫자=한국 mm · EU는 일반 남성 기준 근사값(브랜드별 다를 수 있음)</div>`;
-    }
-    return `<div class="sizegrid"><span class="sizechip wide">${escapeHtml(sizes)}</span></div>`;
+  // 품번 클릭 시 항상 뜨는 사이즈 환산표 — 구매 가능 사이즈는 파란색으로 매칭 표시
+  function sizeTable(stockStr, siteName){
+    const raw=(stockStr||'').trim();
+    const avail=new Set(raw.split(',').map(s=>s.trim()).filter(s=>/^\d+$/.test(s)));
+    const hasNums=avail.size>0;
+    const nonNumeric = raw && !hasNums;               // 예: '판매중'
+    const STD=[]; for(let mm=220; mm<=300; mm+=5) STD.push(mm);
+    // 재고에 표에 없는 사이즈가 있으면 추가
+    avail.forEach(v=>{ const n=+v; if(n && !STD.includes(n)) STD.push(n); });
+    STD.sort((a,b)=>a-b);
+    let note = hasNums ? `${escapeHtml(siteName)} 재고 ${avail.size}개 · <b style="color:var(--accent)">파란색=구매가능</b>`
+             : nonNumeric ? `재고표기 "${escapeHtml(raw)}" · 아래는 mm↔EU 참고표`
+             : '이 상품은 사이즈 정보 없음 · 아래는 mm↔EU 참고표';
+    const grid=`<div class="sizegrid ${hasNums?'hasdata':''}">`+STD.map(mm=>{
+      const on=avail.has(''+mm);
+      return `<span class="sizechip ${on?'avail':''}"><b>${mm}</b><i>EU ${euFromMm(mm)}</i></span>`;
+    }).join('')+'</div>';
+    return `<div class="dt-sec">사이즈 환산표 <span class="dt-note">${note}</span></div>${grid}`
+         + `<div class="sizehint">숫자=한국 mm · EU는 일반 남성 기준 근사값(브랜드별 다를 수 있음)</div>`;
   }
   function openDetail(x){
     if(!x) return;
@@ -1005,7 +1018,7 @@ window.ShoeXlsx = (function(){
     if(x[12]) html+=`<a class="dt-buy poi" href="${escapeAttr(x[12])}" target="_blank" rel="noopener">📈 포이즌에서 보기</a>`;
     if(!x[11]&&!x[12]) html+='<span class="cmpsingle">구매 링크 없음</span>';
     html+='</div>';
-    html+=`<div class="dt-sec">사이즈 <span class="dt-note">${escapeHtml(S[x[2]])} 재고 기준</span></div>`+sizeBlock(x[10]);
+    html+=sizeTable(x[10], S[x[2]]);
     const group=code?R.filter(r=>r[9]===code):[];
     if(group.length>1){
       group.sort((a,b)=>a[3]-b[3]); const minSrc=group[0][3];
