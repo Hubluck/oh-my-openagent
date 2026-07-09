@@ -67,15 +67,20 @@ def normalize(xlsx_path, date=None):
         return lst.index(v)
 
     recs = []
-    for r in rows[1:]:
+    for i, r in enumerate(rows[1:], start=2):   # i = 실제 엑셀 행번호 (하이퍼링크 조회용)
         if r[0] is None:
             continue
         name = (r[2] or "").strip()
+        sl = ws.cell(i, 15).hyperlink   # 소싱링크
+        pl = ws.cell(i, 16).hyperlink   # 포이즌링크
         recs.append([
             name, idx(brands, r[3]), idx(sites, r[4]),
             int(r[5] or 0), int(r[6] or 0), int(r[8] or 0),
             int(r[9] or 0), int(r[10] or 0), round(r[11] or 0, 1),
-            str(r[1] or "").strip(),   # 9: 상품 코드 (요청 참조용)
+            str(r[1] or "").strip(),        # 9: 상품 코드
+            str(r[7] or "").strip(),        # 10: 재고/사이즈
+            sl.target if sl else "",        # 11: 소싱 구매 링크
+            pl.target if pl else "",        # 12: 포이즌 링크
         ])
 
     pos = [x for x in recs if x[7] > 0]

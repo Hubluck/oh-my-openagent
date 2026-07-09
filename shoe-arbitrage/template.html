@@ -51,7 +51,7 @@
     -webkit-font-smoothing:antialiased; line-height:1.45;
   }
   .num{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-variant-numeric:tabular-nums; letter-spacing:-.02em}
-  .wrap{max-width:760px; margin:0 auto; padding:16px 14px 60px}
+  .wrap{max-width:960px; margin:0 auto; padding:16px 14px 60px}
 
   header.top{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:14px}
   .eyebrow{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); font-weight:700}
@@ -223,8 +223,23 @@
   .cmp-src{font-size:14px; font-weight:800; font-variant-numeric:tabular-nums}
   .cmp-net{font-size:11.5px; font-weight:700; color:var(--profit); font-variant-numeric:tabular-nums} .cmp-net.neg{color:var(--loss)}
   .cmpsingle{font-size:12.5px; color:var(--muted); padding:8px 2px}
+  /* 상세: 구매 링크 + 사이즈 */
+  .dt-links{display:flex; gap:8px; flex-wrap:wrap; margin:2px 0 4px}
+  .dt-buy{flex:1; min-width:140px; text-align:center; padding:13px 12px; border-radius:12px; font-size:13.5px;
+    font-weight:800; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:6px}
+  .dt-buy.src{background:var(--accent); color:#fff}
+  .dt-buy.poi{background:var(--ink); color:var(--surface)}
+  .dt-buy:active{transform:scale(.98)}
+  .dt-sec{font-size:11.5px; font-weight:800; color:var(--muted); letter-spacing:.03em; margin:16px 0 9px; display:flex; align-items:center; gap:7px}
+  .dt-note{font-weight:600; color:var(--muted); opacity:.85}
+  .sizegrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(56px,1fr)); gap:7px}
+  .sizechip{border:1px solid var(--hair); border-radius:9px; padding:10px 4px; text-align:center; font-size:13px;
+    font-weight:700; font-variant-numeric:tabular-nums; background:var(--surface-2); color:var(--ink)}
+  .sizechip.wide{grid-column:1/-1; font-weight:800; color:var(--profit)}
 
-  .list{display:flex; flex-direction:column; gap:10px}
+  .list{display:grid; grid-template-columns:1fr; gap:10px}
+  @media(min-width:680px){ .list{grid-template-columns:1fr 1fr} }
+  .empty-list{grid-column:1/-1}
   .row{background:var(--surface); border:1px solid var(--hair); border-radius:15px; padding:13px 14px; box-shadow:var(--shadow);
     position:relative; overflow:hidden}
   .row::before{content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--profit)}
@@ -281,7 +296,8 @@
   .invactions{display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap}
   .invempty{text-align:center; color:var(--muted); padding:46px 16px; font-size:13px; line-height:1.7;
     border:1px dashed var(--hair); border-radius:14px}
-  .invlist{display:flex; flex-direction:column; gap:10px}
+  .invlist{display:grid; grid-template-columns:1fr; gap:10px}
+  @media(min-width:680px){ .invlist{grid-template-columns:1fr 1fr} }
   .invrow{background:var(--surface); border:1px solid var(--hair); border-radius:14px; padding:12px 13px; box-shadow:var(--shadow);
     position:relative; overflow:hidden}
   .invrow::before{content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--accent)}
@@ -481,7 +497,7 @@ window.ShoeXlsx = (function(){
   function sheetRows(xml, shared){
     const doc=parseXML(xml), rows=[];
     for(const row of doc.getElementsByTagName('row')){
-      const arr=[];
+      const arr=[]; arr._r = +row.getAttribute('r') || 0;
       for(const c of row.getElementsByTagName('c')){
         const ci=colNum(c.getAttribute('r')||'A'), t=c.getAttribute('t');
         let v=null;
@@ -492,6 +508,27 @@ window.ShoeXlsx = (function(){
       rows.push(arr);
     }
     return rows;
+  }
+  async function sheetHyperlinks(zip, sheetPath){
+    try{
+      const xml = await zip.readText(sheetPath); if(!xml) return {};
+      const doc = parseXML(xml);
+      const hl = doc.getElementsByTagName('hyperlink');
+      if(!hl.length) return {};
+      const relPath = sheetPath.replace(/([^/]+)$/, '_rels/$1.rels');
+      const relXml = await zip.readText(relPath);
+      const rid = {};
+      if(relXml) for(const r of parseXML(relXml).getElementsByTagName('Relationship')) rid[r.getAttribute('Id')]=r.getAttribute('Target');
+      const relNS='http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+      const map={};
+      for(const h of hl){
+        const ref=h.getAttribute('ref');
+        const id=h.getAttribute('r:id')||h.getAttributeNS(relNS,'id');
+        const tgt=h.getAttribute('location')||rid[id]||'';
+        if(ref && tgt) map[ref]=tgt;
+      }
+      return map;
+    }catch(e){ return {}; }
   }
   async function sheetMap(zip){
     const wb=parseXML(await zip.readText('xl/workbook.xml'));
@@ -509,16 +546,21 @@ window.ShoeXlsx = (function(){
     return map;
   }
   function num(v){const n=parseFloat(v); return isFinite(n)?n:0;}
-  function normalize(rows, date){
+  function normalize(rows, date, hyper){
+    hyper = hyper || {};
     const brands=[], sites=[];
     const idx=(lst,v)=>{v=(v==null||v==='')?'기타':(''+v); let i=lst.indexOf(v); if(i<0){lst.push(v); i=lst.length-1;} return i;};
     const recs=[];
     for(let i=1;i<rows.length;i++){
       const r=rows[i]; if(!r||r[0]==null) continue;
+      const rn = r._r || (i+1);
       recs.push([ (''+(r[2]||'')).trim(), idx(brands,r[3]), idx(sites,r[4]),
         Math.round(num(r[5])), Math.round(num(r[6])), Math.round(num(r[8])),
         Math.round(num(r[9])), Math.round(num(r[10])), Math.round(num(r[11])*10)/10,
-        (''+(r[1]||'')).trim() ]);   // 9: 상품 코드
+        (''+(r[1]||'')).trim(),          // 9: 상품 코드
+        (''+(r[7]||'')).trim(),          // 10: 재고/사이즈
+        hyper['O'+rn]||'',               // 11: 소싱 링크
+        hyper['P'+rn]||'' ]);            // 12: 포이즌 링크
     }
     const pos=recs.filter(x=>x[7]>0);
     const m={ total:recs.length, arb:pos.length,
@@ -542,11 +584,12 @@ window.ShoeXlsx = (function(){
     const matchName=findSheet('전체매칭')||findSheet('수요');
     if(!matchName) throw new Error("'전체매칭' 시트를 찾지 못했습니다.");
     const rows=sheetRows(await zip.readText(map[matchName]), shared);
+    const hyper=await sheetHyperlinks(zip, map[matchName]);
     let dateRows=rows;
     const sumName=findSheet('요약');
     if(sumName){ try{ dateRows=sheetRows(await zip.readText(map[sumName]), shared).concat(rows);}catch(e){} }
     const date=detectDate(dateRows, file.name);
-    return {date, snap:normalize(rows, date)};
+    return {date, snap:normalize(rows, date, hyper)};
   }
   return {parse};
 })();
@@ -700,7 +743,7 @@ window.ShoeXlsx = (function(){
     const code=x[9]||'';
     return `<div class="row ${neg?'neg':''}" data-key="${escapeHtml(key)}">
       <div class="row-code">
-        <button class="codeval ${code?'':'none'} num" data-act="cmp" data-code="${escapeHtml(code)}" ${code?'':'disabled'} type="button" title="이 품번 매장별 비교">${code?escapeHtml(code):'품번 없음'}</button>
+        <button class="codeval ${code?'':'none'} num" data-act="detail" data-code="${escapeHtml(code)}" ${code?'':'disabled'} type="button" title="사이즈·구매링크·매장비교">${code?escapeHtml(code):'품번 없음'}</button>
         <div class="actbtns">
           <button class="act" data-act="cart" type="button" title="재고에 구매 기록">🛒</button>
           <button class="act ${on?'on':''}" data-act="pin" type="button" title="요청 담기">📌</button>
@@ -937,26 +980,39 @@ window.ShoeXlsx = (function(){
     persistReq(); paint(); renderReq();
   }
 
-  // 품번 매장별 비교
-  function openCmp(code){
-    if(!code) return;
-    const group=R.filter(x=>x[9]===code);
-    if(!group.length) return;
-    group.sort((a,b)=>a[3]-b[3]);
-    const first=group[0], minSrc=first[3];
-    $('cmpcode').textContent=code;
-    $('cmpname').textContent=first[0];
-    $('cmpmkt').textContent=`포이즌 시장가 ${won(first[5])} · 매칭 매장 ${group.length}곳`;
-    $('cmplist').innerHTML=group.map(x=>{
-      const net=effMargin(x), best=x[3]===minSrc;
-      return `<div class="cmprow ${best?'best':''}">
-        <span class="cmp-site">${escapeHtml(S[x[2]])}${best?'<span class="cmp-best">최저</span>':''}</span>
-        <div class="cmp-r">
-          <div class="cmp-src num">${wonPlain(x[3])}</div>
-          <div class="cmp-net num ${net<0?'neg':''}">${feesActive()?'실수령 ':'마진 '}${signed(net)}</div>
-        </div>
-      </div>`;
-    }).join('') + (group.length===1?'<div class="cmpsingle">이 품번은 이 매장에서만 매칭됐어요.</div>':'');
+  // 상품 상세 — 사이즈 + 구매 링크 + 매장별 비교 (포이즌 앱 느낌)
+  const escapeAttr=s=>(s||'').replace(/"/g,'%22');
+  function sizeBlock(sizes){
+    sizes=(sizes||'').trim();
+    if(!sizes) return '<div class="cmpsingle">사이즈 정보 없음 (소싱 링크에서 확인)</div>';
+    if(/[,]/.test(sizes) && /\d/.test(sizes)){
+      return '<div class="sizegrid">'+sizes.split(',').map(s=>`<span class="sizechip">${escapeHtml(s.trim())}</span>`).join('')+'</div>';
+    }
+    return `<div class="sizegrid"><span class="sizechip wide">${escapeHtml(sizes)}</span></div>`;
+  }
+  function openDetail(x){
+    if(!x) return;
+    const code=x[9], net=effMargin(x);
+    $('cmpcode').textContent = code || x[0];
+    $('cmpname').textContent = x[0];
+    $('cmpmkt').textContent = `${escapeHtml(B[x[1]])} · ${escapeHtml(S[x[2]])} · 소싱 ${won(x[3])} → 시장 ${won(x[5])} · ${feesActive()?'실수령':'마진'} ${signed(net)}`;
+    let html='<div class="dt-links">';
+    if(x[11]) html+=`<a class="dt-buy src" href="${escapeAttr(x[11])}" target="_blank" rel="noopener">🛒 ${escapeHtml(S[x[2]])}에서 사기</a>`;
+    if(x[12]) html+=`<a class="dt-buy poi" href="${escapeAttr(x[12])}" target="_blank" rel="noopener">📈 포이즌에서 보기</a>`;
+    if(!x[11]&&!x[12]) html+='<span class="cmpsingle">구매 링크 없음</span>';
+    html+='</div>';
+    html+=`<div class="dt-sec">사이즈 <span class="dt-note">${escapeHtml(S[x[2]])} 재고 기준</span></div>`+sizeBlock(x[10]);
+    const group=code?R.filter(r=>r[9]===code):[];
+    if(group.length>1){
+      group.sort((a,b)=>a[3]-b[3]); const minSrc=group[0][3];
+      html+=`<div class="dt-sec">매장별 소싱가 비교 <span class="dt-note">${group.length}곳 · 싼 순</span></div>`;
+      html+=group.map(r=>{const rn=effMargin(r),best=r[3]===minSrc;
+        return `<div class="cmprow ${best?'best':''}">
+          <span class="cmp-site">${escapeHtml(S[r[2]])}${best?'<span class="cmp-best">최저</span>':''}</span>
+          <div class="cmp-r"><div class="cmp-src num">${wonPlain(r[3])}</div><div class="cmp-net num ${rn<0?'neg':''}">${feesActive()?'실수령 ':''}${signed(rn)}</div></div>
+        </div>`;}).join('');
+    }
+    $('cmplist').innerHTML=html;
     $('cmpmodal').hidden=false;
   }
   function closeCmp(){ $('cmpmodal').hidden=true; }
@@ -965,8 +1021,8 @@ window.ShoeXlsx = (function(){
   document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeCmp(); });
 
   listEl.addEventListener('click',e=>{
-    const cm=e.target.closest('[data-act="cmp"]');
-    if(cm){ if(cm.dataset.code) openCmp(cm.dataset.code); return; }
+    const dt=e.target.closest('[data-act="detail"]');
+    if(dt){ const x=findRec(dt.closest('.row').getAttribute('data-key')); if(x) openDetail(x); return; }
     const cp=e.target.closest('[data-act="copy"]');
     if(cp){ copyText(cp.dataset.code); const orig=cp.textContent; cp.classList.add('done'); cp.textContent='✓ 복사됨';
       setTimeout(()=>{cp.classList.remove('done'); cp.textContent=orig;},1200); return; }
@@ -974,8 +1030,12 @@ window.ShoeXlsx = (function(){
     if(ct){ const x=findRec(ct.closest('.row').getAttribute('data-key')); if(x) addToInv(x);
       const orig=ct.textContent; ct.classList.add('done'); ct.textContent='✓ 담김';
       setTimeout(()=>{ct.classList.remove('done'); ct.textContent=orig;},1200); return; }
-    const pin=e.target.closest('[data-act="pin"]'); if(!pin) return;
-    const key=pin.closest('.row').getAttribute('data-key'); const x=findRec(key); if(x) togglePin(x);
+    const pin=e.target.closest('[data-act="pin"]');
+    if(pin){ const x=findRec(pin.closest('.row').getAttribute('data-key')); if(x) togglePin(x); return; }
+    // 카드 본문 아무 곳이나 탭 → 상세
+    if(e.target.closest('input, a')) return;
+    const row=e.target.closest('.row');
+    if(row){ const x=findRec(row.getAttribute('data-key')); if(x) openDetail(x); }
   });
   listEl.addEventListener('input',e=>{
     const m=e.target.closest('[data-act="memo"]'); if(!m) return;
